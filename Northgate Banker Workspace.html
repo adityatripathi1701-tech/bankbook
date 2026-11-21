@@ -1,0 +1,1150 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Northgate Banker Workspace</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: fixed left sidebar + sticky top bar; content is scannable cards and tables. Off-canvas sidebar under 920px. */
+:root{
+  --bg:#f3f6f6; --surface:#ffffff; --surface2:#edf2f2; --line:#d6dfdf; --fg:#13231f; --muted:#576a66;
+  --accent:#0e6a62; --accent-fg:#ffffff; --accent-soft:#d9eeea; --side:#0f2f2b; --side-fg:#c9dfda; --side-active:#1c4a44;
+  --ok:#1b7447; --ok-bg:#ddf2e5; --warn:#8d5400; --warn-bg:#fcefd0; --crit:#b0241c; --crit-bg:#fce3df; --info:#1b5d98; --info-bg:#dfecf8;
+  --shadow:0 1px 2px rgba(15,47,43,.08),0 4px 14px rgba(15,47,43,.06);
+  --font:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1514; --surface:#132120; --surface2:#1a2c2a; --line:#29403d; --fg:#e5f0ee; --muted:#94aaa6;
+  --accent:#4cc2b3; --accent-fg:#06201d; --accent-soft:#18413c; --side:#091110; --side-fg:#b7cfca; --side-active:#16332f;
+  --ok:#6fd29a; --ok-bg:#15342a; --warn:#f0b857; --warn-bg:#3a2d12; --crit:#ff9188; --crit-bg:#3d1a18; --info:#82bbf2; --info-bg:#162a3c;
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1514; --surface:#132120; --surface2:#1a2c2a; --line:#29403d; --fg:#e5f0ee; --muted:#94aaa6;
+  --accent:#4cc2b3; --accent-fg:#06201d; --accent-soft:#18413c; --side:#091110; --side-fg:#b7cfca; --side-active:#16332f;
+  --ok:#6fd29a; --ok-bg:#15342a; --warn:#f0b857; --warn-bg:#3a2d12; --crit:#ff9188; --crit-bg:#3d1a18; --info:#82bbf2; --info-bg:#162a3c;
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 var(--font);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+h1,h2,h3,h4{margin:0;font-weight:600;text-wrap:balance;line-height:1.25}
+h1{font-size:20px}h2{font-size:16px}h3{font-size:14px}
+p{margin:0}a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.mono{font-family:var(--mono);font-size:12px}
+.muted{color:var(--muted)}.small{font-size:12px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* shell */
+.side{position:fixed;left:0;top:0;bottom:0;width:236px;background:var(--side);color:var(--side-fg);padding:calc(14px + env(safe-area-inset-top,0px)) 12px 14px max(12px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:6px;z-index:50;overflow-y:auto}
+.brand{display:flex;gap:10px;align-items:center;padding:6px 8px 14px;color:#fff}
+.brand b{display:block;font-size:15px;letter-spacing:.2px}.brand small{color:var(--side-fg);font-size:11px}
+.logo{width:30px;height:30px;border-radius:7px;background:var(--accent);display:grid;place-items:center;color:var(--accent-fg)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:7px;color:var(--side-fg);text-decoration:none;font-weight:500}
+.nav a:hover{background:rgba(255,255,255,.07)}
+.nav a[aria-current="page"]{background:var(--side-active);color:#fff}
+.nav .sep{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;padding:12px 10px 4px}
+.nav .badge{margin-left:auto;background:var(--crit);color:#fff;border-radius:10px;font-size:11px;padding:0 6px;min-width:18px;text-align:center}
+.side-foot{margin-top:auto;font-size:11px;opacity:.75;padding:10px 8px}
+.main{margin-left:236px;min-width:0;padding-bottom:48px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.top h1{flex:1 1 140px;min-width:0}
+.search{position:relative;flex:1 1 220px;max-width:340px;min-width:160px}
+.search input{width:100%;padding:8px 10px 8px 32px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.search .ic{position:absolute;left:9px;top:9px;color:var(--muted)}
+.pop{position:absolute;z-index:70;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);min-width:260px;max-height:70vh;overflow:auto}
+.search .pop{left:0;right:0}
+.pop a,.pop button.pi{display:block;width:100%;text-align:left;background:none;border:0;padding:9px 12px;text-decoration:none;color:var(--fg);cursor:pointer;border-bottom:1px solid var(--line)}
+.pop a:hover,.pop button.pi:hover,.pop a:focus-visible{background:var(--surface2)}
+.pop .none{padding:12px;color:var(--muted)}
+.tools{display:flex;gap:8px;align-items:center;margin-left:auto;position:relative}
+.iconbtn{position:relative;border:1px solid var(--line);background:var(--surface);border-radius:8px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer}
+.iconbtn .dot{position:absolute;top:-5px;right:-5px;background:var(--crit);color:#fff;border-radius:10px;font-size:10px;min-width:17px;padding:0 4px;text-align:center;line-height:17px}
+.who{display:flex;flex-direction:column;gap:2px}
+.who select{padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);max-width:190px}
+.menu-btn{display:none}
+.demo-bar{background:var(--warn-bg);color:var(--warn);font-size:12px;padding:6px 10px;border-radius:0 0 8px 8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.view{padding-top:18px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.vhead{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;justify-content:space-between}
+.vhead p{max-width:62ch;color:var(--muted)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grow{flex:1 1 0;min-width:0}
+.grid{display:grid;gap:16px;min-width:0}
+.g2{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}.g2e{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.card>header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.card.flat{box-shadow:none}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums;font-weight:600}
+.stat span{font-size:12px;color:var(--muted)}
+.stat.crit b{color:var(--crit)}.stat.warn b{color:var(--warn)}
+/* buttons, chips */
+.btn{display:inline-flex;gap:6px;align-items:center;justify-content:center;border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:500;text-decoration:none;color:var(--fg);white-space:nowrap}
+.btn:hover{background:var(--surface2)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}.btn.pri:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--crit);border-color:var(--crit)}
+.btn.sm{padding:4px 9px;font-size:12px}.btn.ghost{border-color:transparent;background:none;color:var(--accent)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.chip{display:inline-flex;gap:4px;align-items:center;font-size:12px;font-weight:500;padding:1px 8px;border-radius:20px;background:var(--surface2);color:var(--fg);white-space:nowrap;border:1px solid transparent}
+.chip.ok{background:var(--ok-bg);color:var(--ok)}.chip.warn{background:var(--warn-bg);color:var(--warn)}.chip.crit{background:var(--crit-bg);color:var(--crit)}.chip.info{background:var(--info-bg);color:var(--info)}
+.chip.ai{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.chip.assume{background:none;color:var(--warn);border:1px dashed var(--warn)}
+/* lists */
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.item{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item input[type=checkbox]{width:18px;height:18px;margin-top:2px;accent-color:var(--accent);flex:none}
+.item .t{font-weight:500;overflow-wrap:anywhere}
+.item .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:12px;margin-top:3px}
+.item .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.grouplabel{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;padding:10px 0 2px;display:flex;gap:6px;align-items:center}
+.grouplabel.over{color:var(--crit)}.grouplabel.today{color:var(--warn)}.grouplabel.up{color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:22px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:8px;align-items:center}
+.empty b{color:var(--fg)}
+.bar{height:8px;border-radius:6px;background:var(--surface2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:9px 12px;background:var(--surface2);white-space:nowrap}
+td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+tr.hl td{background:var(--accent-soft)}
+/* forms */
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f label,.lbl{font-weight:500;font-size:13px}
+.f input,.f select,.f textarea,.filters input,.filters select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);width:100%;min-width:0}
+.f textarea{min-height:90px;resize:vertical}
+.hint{color:var(--muted);font-size:12px}
+.fg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.fg .full{grid-column:1/-1}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.filters .f{flex:1 1 150px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+/* modal + drawer */
+.scrim{position:fixed;inset:0;background:rgba(5,15,14,.55);z-index:80;display:flex;justify-content:center;align-items:flex-start;padding:5vh 12px;overflow-y:auto}
+.modal{background:var(--surface);border-radius:12px;border:1px solid var(--line);width:min(640px,100%);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.modal.wide{width:min(940px,100%)}
+.modal>header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.modal .body{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.modal footer,.mfoot{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding-top:4px}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--surface);border-left:1px solid var(--line);z-index:85;display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.25);padding-top:env(safe-area-inset-top,0px)}
+.drawer>header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.drawer .chat{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.drawer form{display:flex;gap:6px;padding:10px 16px max(12px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+.drawer form input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.msg{padding:10px 12px;border-radius:10px;background:var(--surface2);display:flex;flex-direction:column;gap:8px;overflow-wrap:anywhere}
+.msg.me{background:var(--accent);color:var(--accent-fg);align-self:flex-end;max-width:85%}
+.why{border-left:3px solid var(--accent);padding-left:10px;display:flex;flex-direction:column;gap:3px;font-size:13px}
+.src{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:120;display:flex;flex-direction:column;gap:8px;align-items:center;width:min(480px,calc(100% - 32px))}
+.toast{background:var(--fg);color:var(--bg);padding:10px 14px;border-radius:8px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow);width:100%;justify-content:space-between}
+.toast button{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;font-weight:600}
+/* misc */
+.banner{border-radius:8px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;background:var(--info-bg);color:var(--info)}
+.banner.ok{background:var(--ok-bg);color:var(--ok)}.banner.warn{background:var(--warn-bg);color:var(--warn)}.banner.crit{background:var(--crit-bg);color:var(--crit)}.banner.ai{background:var(--accent-soft);color:var(--accent)}
+.banner>div{min-width:0}.banner b{font-weight:600}
+.tl{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.tl li{position:relative}.tl li::before{content:"";position:absolute;left:-20px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.tl li.x::before{background:var(--warn)}.tl li.n::before{background:var(--muted)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal .dow{font-size:11px;text-transform:uppercase;color:var(--muted);text-align:center;padding:2px}
+.cal button.day{min-height:64px;border:1px solid var(--line);background:var(--surface);border-radius:8px;text-align:left;padding:4px 6px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden}
+.cal button.day.out{opacity:.45}.cal button.day.sel{outline:2px solid var(--accent)}.cal button.day.tdy b{color:var(--accent)}
+.cal .ev{font-size:11px;background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal .ev.u{background:var(--warn-bg);color:var(--warn)}
+.skel{height:84px;border-radius:10px;background:linear-gradient(90deg,var(--surface2),var(--surface),var(--surface2));background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+pre.code{background:var(--surface2);padding:12px;border-radius:8px;overflow-x:auto;font:12px/1.5 var(--mono);margin:0}
+details>summary{cursor:pointer;font-weight:500}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.tabs button{border:0;background:none;padding:8px 12px;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);font-weight:500}
+.tabs button[aria-selected="true"]{color:var(--accent);border-color:var(--accent)}
+.scrim-nav{display:none}
+@media (max-width:1100px){.g2,.g3{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:920px){
+  .side{transform:translateX(-102%);transition:transform .2s;width:260px}
+  body.nav-open .side{transform:none}
+  body.nav-open .scrim-nav{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:45}
+  .main{margin-left:0}.menu-btn{display:grid}
+  .g2e{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){.fg{grid-template-columns:minmax(0,1fr)}.item{flex-wrap:wrap}.item .acts{justify-content:flex-start}.who select{max-width:140px}.search{max-width:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<div class="scrim-nav" data-act="nav-close"></div>
+<aside class="side" id="side" aria-label="Main navigation"></aside>
+<div class="main">
+  <header class="top" id="top"></header>
+  <div class="demo-bar" role="note"><b>Demo mode</b> Fictional bank, fictional customers, mock integrations. Cooldowns, TATs and targets are <span class="chip assume">assumptions to validate</span> before any real banking deployment.</div>
+  <main id="view" class="view" tabindex="-1" aria-live="polite"></main>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div id="layer"></div>
+<script>
+'use strict';
+/* ============ helpers ============ */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DAY=864e5,HR=36e5,MIN=6e4;
+const now=()=>Date.now();
+const sod=t=>{const d=new Date(t);d.setHours(0,0,0,0);return d.getTime()};
+const at=(off,h,m=0)=>{const d=new Date();d.setHours(h,m,0,0);d.setDate(d.getDate()+off);return d.getTime()};
+const laterToday=mins=>Math.min(now()+mins*MIN,sod(now())+DAY-5*MIN);
+const fmtD=t=>new Date(t).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+const fmtDW=t=>new Date(t).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+const fmtT=t=>new Date(t).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true});
+const fmtDT=t=>fmtD(t)+', '+fmtT(t);
+const pad=n=>String(n).padStart(2,'0');
+const lin=t=>{const d=new Date(t);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())};
+const din=t=>lin(t).slice(0,10);
+const fromL=v=>new Date(v).getTime();
+const fromD=v=>new Date(v+'T17:30').getTime();
+const timeState=t=>t<now()?'overdue':(sod(t)===sod(now())?'today':'upcoming');
+function dur(ms){ms=Math.abs(ms);const d=Math.floor(ms/DAY),h=Math.floor(ms%DAY/HR),m=Math.floor(ms%HR/MIN);return d?d+'d '+h+'h':h?h+'h '+m+'m':m+'m'}
+const remaining=t=>t<now()?'Overdue by '+dur(now()-t):dur(t-now())+' left';
+function ago(t){const d=now()-t;if(d<0)return 'in '+dur(d);if(d<HR)return Math.max(1,Math.floor(d/MIN))+' min ago';if(d<DAY)return Math.floor(d/HR)+' h ago';return Math.floor(d/DAY)+' d ago'}
+function dueChip(t,label=''){const s=timeState(t);
+  if(s==='overdue')return `<span class="chip crit" title="${esc(fmtDT(t))}">⚠ Overdue ${dur(now()-t)}${label}</span>`;
+  if(s==='today')return `<span class="chip warn" title="${esc(fmtDT(t))}">● Due today ${fmtT(t)}${label}</span>`;
+  return `<span class="chip" title="${esc(fmtDT(t))}">Upcoming · ${fmtDW(t)}${label}</span>`}
+const chip=(t,k='')=>`<span class="chip ${k}">${esc(t)}</span>`;
+const uid=p=>p+Math.random().toString(36).slice(2,8);
+const ICON={sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+notes:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/>',pin:'<path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+alert:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>',clip:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/>',
+mega:'<path d="M3 11v3l12 5V6L3 11z"/><path d="M15 9a3 3 0 010 6M6 14v5"/>',bell:'<path d="M6 16V11a6 6 0 1112 0v5l2 2H4z"/><path d="M10 21h4"/>',
+users:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0M16 5a3 3 0 010 6M18 14a5 5 0 013 6"/>',cog:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+search:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/>',plus:'<path d="M12 5v14M5 12h14"/>',check:'<path d="M5 12l5 5 9-10"/>',spark:'<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>',
+shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',bank:'<path d="M3 10l9-6 9 6M5 10v8M10 10v8M14 10v8M19 10v8M3 20h18"/>'};
+const ic=(n,s=18)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]||''}</svg>`;
+const CHANNELS=['Phone','SMS','Email','WhatsApp','In person'];
+const opt=(arr,val)=>arr.map(o=>{const[v,l]=Array.isArray(o)?o:[o,o];return `<option value="${esc(v)}"${String(v)===String(val)?' selected':''}>${esc(l)}</option>`}).join('');
+const fld=(label,name,html,hint='',cls='')=>`<div class="f ${cls}"><label for="f-${name}">${label}</label>${html}${hint?`<small class="hint">${hint}</small>`:''}</div>`;
+const inp=(name,val='',attrs='')=>`<input id="f-${name}" name="${name}" value="${esc(val)}" ${attrs}>`;
+const selx=(name,options,val,attrs='')=>`<select id="f-${name}" name="${name}" ${attrs}>${opt(options,val)}</select>`;
+const txa=(name,val='',attrs='')=>`<textarea id="f-${name}" name="${name}" ${attrs}>${esc(val)}</textarea>`;
+
+/* ============ state + "server" ============ */
+const LS='nbw-demo-v3',SS='nbw-user-v3';
+let S=null;
+const ui={route:'my-day',param:null,filters:{},chat:[],calMonth:null,calDay:null,draftId:null,after:null,tab:{},modal:null,assistOpen:false,loading:true,error:null};
+try{ui.uid=sessionStorage.getItem(SS)||'u1'}catch(e){ui.uid='u1'}
+const Server={
+  load(){try{const r=localStorage.getItem(LS);return r?JSON.parse(r):null}catch(e){return null}},
+  save(s){try{localStorage.setItem(LS,JSON.stringify(s))}catch(e){}},
+  /* Demo stand-in for a database transaction: re-read the latest shared state, apply, write back with a version bump.
+     In production this is a SQL transaction with a unique partial index / row lock on the claim (see Settings > Backend). */
+  tx(fn){const latest=this.load();if(latest&&latest.version>S.version)S=latest;let r;try{r=fn(S)}catch(e){console.error(e);r={ok:false,code:'error',msg:String(e)}}S.version++;this.save(S);return r||{ok:true}}
+};
+const cur=()=>S.users.find(u=>u.id===ui.uid)||S.users[0];
+const user=id=>S.users.find(u=>u.id===id);
+const uname=id=>user(id)?user(id).name:'Unknown';
+const cust=id=>S.customers.find(c=>c.id===id)||{id,name:'(unknown customer)',ref:'—',channels:[]};
+const offer=id=>S.offers.find(o=>o.id===id)||{id,name:'(unknown offer)'};
+const proc=id=>S.processes.find(p=>p.id===id);
+const isMgr=()=>cur().role!=='banker';
+const staff=()=>S.users.filter(u=>u.active&&u.role!=='admin');
+function audit(entity,id,action,detail){S.audit.unshift({id:uid('a'),at:now(),userId:ui.uid,entity,entityId:id,action,detail});if(S.audit.length>500)S.audit.length=500}
+function mutate(fn,msg,undo){const r=Server.tx(fn);if(msg&&(!r||r.ok!==false))toast(msg,undo);renderAll();return r}
+function toast(msg,undo){const el=document.createElement('div');el.className='toast';el.innerHTML=`<span>${esc(msg)}</span>`;
+  if(undo){const b=document.createElement('button');b.textContent='Undo';b.onclick=()=>{undo();el.remove()};el.appendChild(b)}
+  $('#toasts').appendChild(el);setTimeout(()=>el.remove(),undo?7000:4200)}
+
+/* ============ seed data (fictional) ============ */
+function seed(){
+  const t=now();
+  const users=[
+    {id:'u1',name:'Anita Rao',role:'banker',branch:'Lakeview Branch',active:true},
+    {id:'u2',name:'Rohan Mehta',role:'banker',branch:'Lakeview Branch',active:true},
+    {id:'u3',name:'Sneha Iyer',role:'banker',branch:'Parkside Branch',active:true},
+    {id:'u4',name:'Vikram Shah',role:'manager',branch:'Lakeview Branch',active:true},
+    {id:'u5',name:'Priya Nair',role:'admin',branch:'Head Office (demo)',active:true}];
+  const C=(id,n,ref,seg,br,own,ch,x={})=>Object.assign({id,name:n,ref,segment:seg,branch:br,ownerId:own,channels:ch,dnc:false,suppressed:false,note:''},x);
+  const all=['Phone','SMS','Email','WhatsApp','In person'];
+  const customers=[
+    C('c1','Meera Kulkarni','CUS-1041','Retail','Lakeview Branch','u1',['Phone','Email','In person'],{note:'Prefers calls after 4 pm.'}),
+    C('c2','Kapoor Textiles','CUS-2210','Business','Lakeview Branch','u2',['Phone','Email','In person']),
+    C('c3','Dev Malhotra','CUS-1077','Retail','Lakeview Branch','u1',['Phone','SMS','In person'],{note:'Asked for a callback next week.'}),
+    C('c4','Farhan Sheikh','CUS-1093','Retail','Lakeview Branch','u1',all),
+    C('c5','Lakshmi Narayanan','CUS-1120','Retail (senior)','Lakeview Branch','u1',['Phone','In person'],{note:'Prefers branch visits.'}),
+    C('c6','Anjali Deshmukh','CUS-1155','Salaried','Parkside Branch','u3',['Phone','Email','WhatsApp']),
+    C('c7','Greenleaf Traders','CUS-2244','Business','Parkside Branch','u3',['Phone','Email']),
+    C('c8','Suresh Pillai','CUS-1188','Retail','Lakeview Branch','u2',all),
+    C('c9','Tanvi Joshi','CUS-1203','Retail','Parkside Branch','u3',[],{dnc:true,note:'Opted out of offer contact (fictional).'}),
+    C('c10','Harpreet Bedi','CUS-1219','Retail','Lakeview Branch','u1',['Phone','Email']),
+    C('c11','Nilgiri Clinics','CUS-2260','Business','Lakeview Branch','u2',['Phone','In person']),
+    C('c12','Rekha Menon','CUS-1241','Retail','Parkside Branch','u3',['Email'],{note:'Email only.'})];
+  const offers=[
+    {id:'o1',name:'Festive FD Rates Information',ruleId:'OR-FD-01',audience:'Customers with a fixed deposit maturing within 60 days (customer record field).',cooldownDays:null,active:true},
+    {id:'o2',name:'Salary Account Benefits Review',ruleId:'OR-SA-02',audience:'Salaried or business-payroll customers (segment field).',cooldownDays:null,active:true},
+    {id:'o3',name:'Card Rewards Refresh Information',ruleId:'OR-CR-03',audience:'Customers holding an active card (product field).',cooldownDays:21,active:true},
+    {id:'o4',name:'SIP Awareness Session Invite',ruleId:'OR-SIP-04',audience:'Customers who requested investment information (interaction log).',cooldownDays:null,active:true}];
+  const tk=(id,title,own,due,cid,lt,lid,src)=>({id,title,ownerId:own,due,status:'open',customerId:cid,linkedType:lt||'customer',linkedId:lid||cid,source:src||'manual',createdBy:own});
+  const tasks=[
+    tk('t1','Call Meera Kulkarni about missing proof of address','u1',t-26*HR,'c1','paperwork','pw1'),
+    tk('t2','Send callback summary to Dev Malhotra','u1',laterToday(45),'c3'),
+    tk('t3','Prepare FD maturity list for the huddle','u1',laterToday(90),null,'none',null,'meeting'),
+    tk('t4','Review card dispute update for Meera Kulkarni','u1',laterToday(20),'c1','issue','i1'),
+    tk('t5','Collect signed mandate form from Kapoor Textiles','u1',at(1,11),'c2','paperwork','pw2'),
+    tk('t6','Confirm branch visit slot with Lakshmi Narayanan','u1',at(2,10),'c5','visit','v4'),
+    tk('t7','Log notes from Harpreet Bedi visit','u1',t-3*HR,'c10','visit','v3'),
+    tk('t8','Follow up with Greenleaf Traders on payroll file','u3',laterToday(60),'c7'),
+    tk('t9','Verify nominee documents for Lakshmi Narayanan','u2',at(1,15),'c5','paperwork','pw3'),
+    tk('t10','Prepare weekly summary for Vikram','u2',at(0,0)-DAY+17*HR,null,'none')];
+  tasks.push({...tk('t11','Revisit statement request for Suresh Pillai','u2',at(3,12),'c8'),status:'done',doneAt:t-2*HR});
+  const tg=(id,own,name,a,g,per,kind,oid)=>({id,ownerId:own,name,achieved:a,goal:g,period:per,source:'Branch huddle, '+fmtD(t-6*DAY),kind,offerId:oid||null});
+  const targets=[tg('g1','u1','Service calls completed',14,25,'This week','service'),tg('g2','u1','Paperwork cases closed',9,15,'This month','paperwork'),tg('g3','u1','FD information sessions offered',3,8,'This month','offer','o1'),
+    tg('g4','u2','Service calls completed',11,20,'This week','service'),tg('g5','u2','Salary account reviews offered',2,6,'This month','offer','o2'),
+    tg('g6','u3','Service calls completed',16,20,'This week','service'),tg('g7','u3','Card rewards information offered',4,7,'This month','offer','o3')];
+  const vs=(id,cid,own,type,start,loc,outcome,remarks,status,fu)=>({id,customerId:cid,ownerId:own,type,start,location:loc,outcome,remarks,status,followUp:fu||null});
+  const visits=[
+    vs('v1','c2','u1','Planned visit',laterToday(70),'Whitefield Industrial Estate (label)','','','Planned'),
+    vs('v2','c8','u1','Planned visit',laterToday(150),'Lakeview Branch, meeting room 2','','','Planned'),
+    vs('v3','c10','u1','Unplanned visit',t-20*HR,'Lakeview Branch counter','Met · information shared','Walked in to ask about debit card limits. Explained the standard limit change request process. He mentioned interest in FD rates but wanted to think about it.','Completed',null),
+    vs('v4','c5','u1','Planned visit',at(2,11),'Lakeview Branch','','','Planned'),
+    vs('v5','c12','u3','Cold-call visit',t-3*DAY,'Parkside market area (label)','Not available','Shop closed. Left a branch contact card.','Completed',null),
+    vs('v6','c7','u3','Planned visit',at(1,14),'Greenleaf yard office (label)','','','Planned')];
+  const H=(a,by,from,to,note)=>({at:a,by,from,to,note});
+  const iss=(id,cid,type,desc,pr,own,st,next,nextDue,due,created,hist)=>({id,customerId:cid,type,desc,priority:pr,ownerId:own,status:st,next,nextDue,due,created,history:hist,escalatedTo:null});
+  const issues=[
+    iss('i1','c1','Card dispute','Customer reports a duplicate charge of a fictional amount on 11 Nov. Dispute form submitted at branch.','High','u1','In Progress','Confirm the dispute reference with the cards team',laterToday(20),t+4*HR,t-4*DAY,[H(t-4*DAY,'u1','','Open','Issue logged at branch.'),H(t-2*DAY,'u1','Open','In Progress','Sent to cards team queue.'),H(t-6*HR,'u1','In Progress','In Progress','Cards team asked for the transaction list.')]),
+    iss('i2','c3','Failed transfer','Online transfer shows debited but not credited to beneficiary.','High','u1','Waiting on Team','Chase payments operations for reversal status',at(0,17),t-5*HR,t-3*DAY,[H(t-3*DAY,'u1','','Open','Logged.'),H(t-2*DAY,'u1','Open','Waiting on Team','Raised with payments operations.')]),
+    iss('i3','c4','Statement request','Customer needs a 12-month statement for a visa application.','Medium','u1','Waiting on Customer','Wait for signed request form',at(2,12),t+2*DAY,t-1*DAY,[H(t-1*DAY,'u1','','Open','Logged.'),H(t-20*HR,'u1','Open','Waiting on Customer','Form sent to customer.')]),
+    iss('i4','c7','Account access','Net banking locked after repeated login attempts.','Medium','u3','Open','Verify identity at branch and unlock',laterToday(120),t+6*HR,t-6*HR,[H(t-6*HR,'u3','','Open','Logged.')]),
+    iss('i5','c11','Cheque issue','Cheque book not received after 10 days.','Low','u2','Reopened','Check dispatch tracking with operations',at(1,11),t+30*HR,t-9*DAY,[H(t-9*DAY,'u2','','Open','Logged.'),H(t-5*DAY,'u2','Open','Resolved','Tracking showed delivered.'),H(t-4*HR,'u2','Resolved','Reopened','Customer says it was not received.')]),
+    iss('i6','c8','Statement request','Duplicate statement requested for tax filing.','Low','u2','Resolved','',null,t+DAY,t-5*DAY,[H(t-5*DAY,'u2','','Open','Logged.'),H(t-3*DAY,'u2','Open','Resolved','Statement emailed.')])];
+  const P=(id,cid,pid,own,due,items)=>({id,customerId:cid,processId:pid,ownerId:own,due,created:t-5*DAY,items});
+  const it=(id,name,ref,type,st,own,next)=>({id,docName:name,ref,type,status:st,ownerId:own,next,reminderId:null});
+  const paperwork=[
+    P('pw1','c1','p1','u1',at(1,17),[it('pi1','Signed address-change request form','§2.1','doc','Received','u1','Verify customer signature against the record'),it('pi2','Proof of new address','§2.2','doc','Pending','u1','Ask customer for a document from the approved list'),it('pi3','Signature verification','§3.1','action','Pending','u1','Verify after form is received'),it('pi4','Submit to Operations queue','§4.1','action','Pending','u1','Submit once the items above are verified')]),
+    P('pw2','c2','p2','u1',t-8*HR,[it('pi5','Board resolution copy','§1.2','doc','Verified','u1','Done'),it('pi6','Signed mandate form','§1.3','doc','Pending','u1','Collect at tomorrow\'s visit'),it('pi7','Authorised signatory ID verification','§2.1','action','Received','u2','Verify ID copy'),it('pi8','Branch manager countersignature','§3.0','action','Pending','u4','Request after documents are verified')]),
+    P('pw3','c5','p3','u2',at(5,17),[it('pi9','Nominee details form','§1.1','doc','Verified','u2','Done'),it('pi10','Customer signature verification','§1.4','action','Received','u2','Verify signature'),it('pi11','Submit nomination to Operations','§2.0','action','Pending','u2','Submit after verification')]),
+    P('pw4','c8','p1','u2',at(3,17),[it('pi12','Signed address-change request form','§2.1','doc','Pending','u2','Request from customer'),it('pi13','Proof of new address','§2.2','doc','Pending','u2','Request from customer'),it('pi14','Signature verification','§3.1','action','Pending','u2','After form is received'),it('pi15','Submit to Operations queue','§4.1','action','Pending','u2','After verification')])];
+  const processes=[
+    {id:'p1',title:'Address Update – Retail Accounts',version:'2.3',status:'Approved',approvedOn:t-90*DAY,tat:'5 working days',tatDays:5,owner:'Retail Operations (fictional)',
+      sections:[{ref:'§2.1',text:'A signed address-change request form is required from the account holder.'},{ref:'§2.2',text:'Proof of the new address must come from the approved document list maintained by Operations.'},{ref:'§3.1',text:'The banker verifies the customer signature against the signature on record before submission.'},{ref:'§4.1',text:'Submit the verified set to the Operations queue within the process TAT.'}],
+      docs:[['Signed address-change request form','§2.1','doc'],['Proof of new address','§2.2','doc'],['Signature verification','§3.1','action'],['Submit to Operations queue','§4.1','action']]},
+    {id:'p2',title:'Business Mandate Update',version:'1.8',status:'Approved',approvedOn:t-60*DAY,tat:'7 working days',tatDays:7,owner:'Business Banking Operations (fictional)',
+      sections:[{ref:'§1.2',text:'A certified copy of the board resolution authorising the mandate change is required.'},{ref:'§1.3',text:'The signed mandate form must carry the signatures of all authorised signatories.'},{ref:'§2.1',text:'Identity of each authorised signatory is verified by the banker.'},{ref:'§3.0',text:'A branch manager countersignature is required before submission.'}],
+      docs:[['Board resolution copy','§1.2','doc'],['Signed mandate form','§1.3','doc'],['Authorised signatory ID verification','§2.1','action'],['Branch manager countersignature','§3.0','action']]},
+    {id:'p3',title:'Nominee Registration',version:'3.0',status:'Approved',approvedOn:t-120*DAY,tat:'3 working days',tatDays:3,owner:'Retail Operations (fictional)',
+      sections:[{ref:'§1.1',text:'A nominee details form completed by the account holder is required.'},{ref:'§1.4',text:'The customer signature is verified before the nomination is submitted.'},{ref:'§2.0',text:'Submit the nomination to Operations within the process TAT.'}],
+      docs:[['Nominee details form','§1.1','doc'],['Customer signature verification','§1.4','action'],['Submit nomination to Operations','§2.0','action']]},
+    {id:'p4',title:'Card Dispute Intake',version:'1.4',status:'Approved',approvedOn:t-45*DAY,tat:'5 working days (service deadline)',tatDays:5,owner:'Cards Operations (fictional)',
+      sections:[{ref:'§1.0',text:'Capture the dispute form and the transaction details exactly as stated by the customer.'},{ref:'§2.0',text:'Share the dispute reference with the customer once the cards team confirms it.'}],
+      docs:[['Dispute form','§1.0','doc'],['Transaction details','§1.0','doc'],['Dispute reference shared with customer','§2.0','action']]},
+    {id:'p5',title:'Dormant Account Reactivation (draft)',version:'0.4',status:'Draft',approvedOn:null,tat:'To be confirmed',tatDays:0,owner:'Retail Operations (fictional)',sections:[{ref:'§1.0',text:'Draft text pending approval. Not used for guidance.'}],docs:[]}];
+  const ev=(cid,oid,uid_,ago_,kind,status,ch,out,note,ex)=>({id:uid('e'),customerId:cid,offerId:oid,userId:uid_,at:t-ago_,kind,status,channel:ch,outcome:out,note:note||'',exception:!!ex});
+  const outreachEvents=[
+    ev('c3','o1','u2',5*DAY,'contact','Awaiting callback','Phone','Awaiting callback','Customer asked to be called back next week after checking his deposit schedule.'),
+    ev('c5','o4','u1',20*DAY,'contact','Declined','In person','Declined','Not interested in investment sessions right now.'),
+    ev('c4','o1','u3',21*DAY,'contact','Contacted','Phone','Information shared','Shared rate sheet. No follow-up requested.'),
+    ev('c10','o1','u2',3*DAY,'contact','Contacted','Email','Information shared','Sent rate information by email.'),
+    ev('c11','o3','u2',2*DAY,'contact','Awaiting callback','Phone','Awaiting callback','Clinic manager will call back after the partners meet.'),
+    ev('c6','o3','u3',20*MIN,'claim','Claimed','Phone','Claim started',''),
+    ev('c8','o2','u1',40*DAY,'contact','Contacted','Phone','Information shared','Shared general information.')];
+  const claims=[{id:'cl1',customerId:'c6',offerId:'o3',userId:'u3',at:t-20*MIN,expiresAt:t+100*MIN,channel:'Phone'}];
+  const pool=[['c1','o1','u1','FD maturing within 60 days'],['c3','o1','u1','FD maturing within 60 days'],['c4','o1','u1','FD maturing within 60 days'],['c10','o1','u1','FD maturing within 60 days'],
+    ['c2','o2','u2','Business payroll customer'],['c7','o2','u3','Business payroll customer'],['c12','o2','u3','Salaried segment'],['c8','o2','u2','Salaried segment'],
+    ['c6','o3','u3','Active card holder'],['c9','o3','u3','Active card holder'],['c11','o3','u2','Active card holder'],['c5','o4','u1','Requested investment information'],['c1','o4','u1','Requested investment information'],['c8','o4','u2','Requested investment information']]
+    .map((p,i)=>({id:'op'+i,customerId:p[0],offerId:p[1],ownerId:p[2],basis:p[3]}));
+  const ix=(cid,d,ch,topic,out,notes,own,kind,next)=>({id:uid('x'),customerId:cid,date:t-d,channel:ch,topic,outcome:out,notes,ownerId:own,kind,nextAction:next||'',source:'manual'});
+  const interactions=[
+    ix('c1',2*DAY,'Phone','Card dispute follow-up','Information shared','Updated customer that the cards team requested the transaction list.','u1','service','Confirm dispute reference'),
+    ix('c3',3*DAY,'Phone','Failed transfer','Information shared','Raised transfer issue with payments operations; customer informed of expected timeline.','u1','service','Chase reversal status'),
+    ix('c10',20*HR,'In person','Debit card limit','Information shared','Walk-in visit about card limits.','u1','service','Log visit notes'),
+    ix('c5',20*DAY,'In person','SIP Awareness Session Invite','Declined','Customer declined the session invite.','u1','offer',''),
+    ix('c2',6*DAY,'Phone','Mandate update','Information shared','Explained the mandate paperwork list.','u2','service','Collect signed form')];
+  const reminders=[
+    {id:'r1',title:'Check callback from Dev Malhotra',ownerId:'u1',at:laterToday(30),recur:'none',channel:'In-app',linkedType:'customer',linkedId:'c3',status:'active',escalatedTo:null},
+    {id:'r2',title:'Submit mandate documents for Kapoor Textiles',ownerId:'u1',at:t-3*HR,recur:'none',channel:'In-app',linkedType:'paperwork',linkedId:'pw2',status:'active',escalatedTo:null},
+    {id:'r3',title:'Send weekly branch summary',ownerId:'u1',at:at(1,16),recur:'weekly',channel:'In-app',linkedType:'none',linkedId:null,status:'active',escalatedTo:null},
+    {id:'r4',title:'Check TAT on Meera Kulkarni card dispute',ownerId:'u1',at:at(1,10),recur:'none',channel:'In-app',linkedType:'issue',linkedId:'i1',status:'active',escalatedTo:null},
+    {id:'r5',title:'Chase cheque book dispatch',ownerId:'u2',at:at(1,10),recur:'none',channel:'In-app',linkedType:'issue',linkedId:'i5',status:'active',escalatedTo:null}];
+  const meetings=[{id:'m1',title:'Lakeview weekly huddle',date:t-6*DAY,sourceType:'Typed notes',sourceText:'Reviewed last week. Anita will keep the paperwork queue under 5 days.',summary:'Reviewed last week and agreed to keep the paperwork queue within process TAT.',decisions:['Paperwork queue stays within process TAT.'],taskIds:[],createdBy:'u4',confirmedAt:t-6*DAY}];
+  const settings={cooldownDays:14,declineCooldownDays:90,claimMinutes:120,escalationHours:24,defaultReminderChannel:'In-app',
+    issueTypes:[['Card dispute',120],['Failed transfer',48],['Statement request',48],['Account access',24],['Cheque issue',72],['Other',72]],
+    channelsConnected:{'In-app':true,'Email':false,'SMS':false},audioCapture:false,transcriptRetentionDays:30,aiMode:'Demo AI (rule-based simulation)',
+    integrations:[['Core banking / customer data','Customer profile, contact preferences, product holdings'],['Work email','Outbound reminders and drafts'],['Work calendar','Visit and meeting sync'],['Product & process content API','Approved offer rules and process documents'],['Speech-to-text service','Transcripts from consented recordings'],['AI model service','Server-side drafting']]};
+  const audit_=[
+    {id:'a0',at:t-2*DAY,userId:'u1',entity:'issue',entityId:'i1',action:'issue.status',detail:'Open → In Progress. Sent to cards team queue.'},
+    {id:'a00',at:t-5*DAY,userId:'u2',entity:'outreach',entityId:'c3|o1',action:'outreach.contact',detail:'Phone · Awaiting callback'}];
+  return {version:1,seededAt:t,users,customers,offers,tasks,targets,visits,issues,paperwork,processes,outreachEvents,claims,pool,interactions,reminders,meetings,drafts:[],settings,audit:audit_};
+}
+function loadState(){
+  const s=Server.load();
+  if(s&&s.version&&s.settings&&s.users){S=s;return}
+  S=seed();Server.save(S);
+}
+
+/* ============ outreach rules (server-side logic in production) ============ */
+const cooldownDaysFor=oid=>{const o=offer(oid);return o.cooldownDays!=null?o.cooldownDays:S.settings.cooldownDays};
+function checkPair(cid,oid,uidv){
+  const c=cust(cid),t=now();
+  const events=S.outreachEvents.filter(e=>e.customerId===cid&&e.offerId===oid).sort((a,b)=>b.at-a.at);
+  const last=events.find(e=>e.kind==='contact');
+  const claim=S.claims.find(x=>x.customerId===cid&&x.offerId===oid&&x.expiresAt>t);
+  const r={events,last,claim,reasons:[],info:[],hard:false,blocked:false,cooldownUntil:null,status:'Available',detail:''};
+  if(c.dnc||c.suppressed){r.hard=true;r.reasons.push({type:'dnc',msg:'This customer has opted out of offer contact (do-not-contact or suppression flag). Outreach cannot be started and exceptions are not available.'});}
+  if(claim&&claim.userId!==uidv){r.blocked=true;r.reasons.push({type:'claim',msg:`${uname(claim.userId)} claimed this outreach at ${fmtT(claim.at)}. The hold runs until ${fmtT(claim.expiresAt)}.`})}
+  if(claim&&claim.userId===uidv)r.info.push('You hold the claim for this outreach.');
+  if(last){
+    const days=last.status==='Declined'?S.settings.declineCooldownDays:cooldownDaysFor(oid);
+    r.cooldownUntil=last.at+days*DAY;r.cooldownDays=days;
+    if(r.cooldownUntil>t){
+      const ownCb=last.status==='Awaiting callback'&&last.userId===uidv;
+      if(ownCb)r.info.push('You recorded this callback request. Following it up is allowed.');
+      else{r.blocked=true;r.reasons.push({type:last.status==='Declined'?'declined':'cooldown',msg:last.status==='Declined'
+        ?`The customer declined this offer on ${fmtD(last.at)} (recorded by ${uname(last.userId)}). Declined offers rest for ${days} days, until ${fmtD(r.cooldownUntil)}.`
+        :`${uname(last.userId)} contacted this customer about this offer by ${last.channel} ${ago(last.at)} (${last.outcome}). Cooldown of ${days} days runs until ${fmtD(r.cooldownUntil)}.`})}
+    }
+  }
+  if(r.hard){r.status='Do not contact';r.detail='Opted out'}
+  else if(claim){r.status='Claimed';r.detail=`${uname(claim.userId)} · until ${fmtT(claim.expiresAt)}`}
+  else if(last&&r.cooldownUntil>t){r.status=last.status;r.detail=`${uname(last.userId)} · ${last.channel} · ${ago(last.at)} · cooldown to ${fmtD(r.cooldownUntil)}`}
+  else if(last){r.detail=`Last contact ${ago(last.at)} by ${uname(last.userId)}; cooldown over`}
+  r.inCooldown=!!(last&&r.cooldownUntil>t);
+  return r;
+}
+const statusKind=s=>({'Available':'ok','Claimed':'info','Contacted':'warn','Awaiting callback':'info','Declined':'crit','Do not contact':'crit'}[s]||'');
+const allowedChannels=c=>c.channels||[];
+const Out={
+  claim(cid,oid,channel,exc){return Server.tx(s=>{
+    const k=cid+'|'+oid,chk=checkPair(cid,oid,ui.uid);
+    if(chk.hard){audit('outreach',k,'outreach.blocked','Attempt blocked: customer opted out.');return{ok:false,code:'hard',chk}}
+    if(!allowedChannels(cust(cid)).includes(channel))return{ok:false,code:'channel'};
+    if(chk.blocked&&!(exc&&exc.reason&&exc.reason.trim().length>=10)){audit('outreach',k,'outreach.blocked','Duplicate outreach prevented: '+chk.reasons.map(r=>r.type).join(', '));return{ok:false,code:'conflict',chk}}
+    s.claims=s.claims.filter(x=>!(x.customerId===cid&&x.offerId===oid));
+    const c={id:uid('cl'),customerId:cid,offerId:oid,userId:ui.uid,at:now(),expiresAt:now()+s.settings.claimMinutes*MIN,channel};s.claims.push(c);
+    s.outreachEvents.push({id:uid('e'),customerId:cid,offerId:oid,userId:ui.uid,at:now(),kind:'claim',status:'Claimed',channel,outcome:'Claim started',note:exc?'Exception: '+exc.category+' – '+exc.reason:'',exception:!!exc});
+    if(exc&&chk.blocked)audit('outreach',k,'outreach.exception',`${exc.category}: ${exc.reason} (overrode: ${chk.reasons.map(r=>r.type).join(', ')})`);
+    audit('outreach',k,'outreach.claim',`Claimed via ${channel}${exc&&chk.blocked?' with exception':''}.`);
+    return{ok:true,claim:c}})},
+  release(cid,oid){return Server.tx(s=>{s.claims=s.claims.filter(x=>!(x.customerId===cid&&x.offerId===oid&&x.userId===ui.uid));
+    s.outreachEvents.push({id:uid('e'),customerId:cid,offerId:oid,userId:ui.uid,at:now(),kind:'release',status:'Released',channel:'',outcome:'Claim released',note:''});audit('outreach',cid+'|'+oid,'outreach.release','Claim released without contact.');return{ok:true}})},
+  defer(cid,oid,date,note){return Server.tx(s=>{
+    s.outreachEvents.push({id:uid('e'),customerId:cid,offerId:oid,userId:ui.uid,at:now(),kind:'defer',status:'Deferred',channel:'',outcome:'Contact deferred',note:note||''});
+    s.tasks.push({id:uid('t'),title:`Revisit outreach: ${cust(cid).name} · ${offer(oid).name}`,ownerId:ui.uid,due:date,status:'open',customerId:cid,linkedType:'outreach',linkedId:cid+'|'+oid,source:'outreach-defer',createdBy:ui.uid});
+    audit('outreach',cid+'|'+oid,'outreach.defer','Deferred to '+fmtD(date)+(note?'. '+note:''));return{ok:true}})},
+  log(cid,oid,d){return Server.tx(s=>{
+    const status={'Information shared':'Contacted','Interested – follow-up agreed':'Contacted','Not reachable':'Contacted','Awaiting callback':'Awaiting callback','Declined':'Declined'}[d.outcome]||'Contacted';
+    s.claims=s.claims.filter(x=>!(x.customerId===cid&&x.offerId===oid&&x.userId===ui.uid));
+    s.outreachEvents.push({id:uid('e'),customerId:cid,offerId:oid,userId:ui.uid,at:now(),kind:'contact',status,channel:d.channel,outcome:d.outcome,note:d.notes,nextFollowUp:d.next||null});
+    s.interactions.unshift({id:uid('x'),customerId:cid,date:now(),channel:d.channel,topic:offer(oid).name,outcome:d.outcome,notes:d.notes,ownerId:ui.uid,kind:'offer',nextAction:d.next?'Follow up on '+fmtD(d.next):'',source:'outreach'});
+    if(d.next)s.tasks.push({id:uid('t'),title:`Follow up: ${cust(cid).name} · ${offer(oid).name}`,ownerId:ui.uid,due:d.next,status:'open',customerId:cid,linkedType:'outreach',linkedId:cid+'|'+oid,source:'outreach',createdBy:ui.uid});
+    const tg=s.targets.find(g=>g.ownerId===ui.uid&&g.offerId===oid);if(tg&&status!=='Declined')tg.achieved++;
+    audit('outreach',cid+'|'+oid,'outreach.contact',`${d.channel} · ${d.outcome}`);return{ok:true}})}
+};
+
+/* ============ demo AI (rule-based simulation; real model runs server-side) ============ */
+const DOWS=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+function parseDue(text){
+  const s=text.toLowerCase(),b=new Date(),mk=(d,h=17,m=30)=>{d.setHours(h,m,0,0);return d.getTime()};
+  if(/\btoday\b|\beod\b|end of (the )?day/.test(s))return{t:mk(new Date()),found:true};
+  if(/\btomorrow\b/.test(s)){const d=new Date();d.setDate(d.getDate()+1);return{t:mk(d),found:true}}
+  let m=s.match(/\bin (\d+) (?:working )?days?\b/);if(m){const d=new Date();d.setDate(d.getDate()+ +m[1]);return{t:mk(d),found:true}}
+  m=s.match(/\b(next )?(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/);
+  if(m){const d=new Date();let diff=(DOWS.indexOf(m[2])-d.getDay()+7)%7;if(diff===0)diff=7;d.setDate(d.getDate()+diff);return{t:mk(d),found:true}}
+  if(/\bthis week\b/.test(s)){const d=new Date();let diff=(5-d.getDay()+7)%7;d.setDate(d.getDate()+diff);return{t:mk(d),found:true}}
+  const d=new Date();d.setDate(d.getDate()+1);return{t:mk(d),found:false};
+}
+function findCustomer(sent){const s=sent.toLowerCase();
+  let c=S.customers.find(c=>s.includes(c.name.toLowerCase()));if(c)return c;
+  return S.customers.find(c=>{const f=c.name.split(' ')[0].toLowerCase();return f.length>=5&&new RegExp('\\b'+f+'\\b').test(s)})||null}
+function findOwner(sent){
+  for(const u of staff()){const f=u.name.split(' ')[0];if(new RegExp('^\\W*'+f+'\\b','i').test(sent)||new RegExp('\\b'+f+'\\s+(will|to|should|must)\\b','i').test(sent))return u.id}
+  return ui.uid}
+const sentences=txt=>txt.replace(/\r/g,'').split(/\n+|(?<=[.!?])\s+/).map(s=>s.trim()).filter(s=>s.length>8);
+const clean=s=>s.replace(/^[-•*\d.)\s]+/,'').replace(/[.\s]+$/,'');
+function aiMeeting(text,title){
+  const S_=sentences(text),tasks=[],decisions=[],targets=[],reminders=[];
+  S_.forEach(s=>{
+    const low=s.toLowerCase();
+    if(/\btarget|\bgoal|\baim\b/.test(low)){
+      const after=s.split(/\b(?:is|of|are|:)\s+(?=\d)/i)[1]||'';
+      after.split(/,|\band\b/).forEach(p=>{const m=p.trim().match(/^(\d[\d,]*)\s+([a-z][a-z \-]+?)\.?$/i);if(m)targets.push({name:m[2].trim().replace(/^./,x=>x.toUpperCase()),goal:+m[1].replace(/,/g,''),period:(low.match(/this (week|month|quarter)/)||['','period'])[0].replace(/^./,x=>x.toUpperCase()),src:s,keep:true})});
+      return}
+    if(/\bremind|check back|call back|callback/.test(low)&&/\bremind|check back/.test(low)){
+      const d=parseDue(s);const dt=new Date(d.t);dt.setHours(10,0,0,0);reminders.push({title:clean(s).slice(0,110),at:lin(dt.getTime()),assumed:!d.found,src:s,keep:true});return}
+    if(/\b(decided|agreed|decision|from now|going forward|instruction|policy)\b/.test(low)){decisions.push({text:clean(s),src:s,keep:true});return}
+    if(/\b(will|to|should|please|must|needs? to)\b/.test(low)&&/\b(call|visit|send|collect|submit|check|review|update|prepare|follow|verify|confirm|log|chase|share)\b/.test(low)){
+      const d=parseDue(s),c=findCustomer(s);
+      tasks.push({title:clean(s).slice(0,120),ownerId:findOwner(s),due:din(d.t),assumed:!d.found,customerId:c?c.id:'',src:s,keep:true})}
+  });
+  const key=S_.filter(s=>/target|decid|agreed|priority|follow|visit|issue|paperwork/i.test(s)).slice(0,3);
+  const summary=(key.length?key:S_.slice(0,3)).map(clean).join('. ')+'.';
+  return{title:title||'Meeting notes',date:din(now()),summary,decisions,tasks,targets,reminders};
+}
+function aiInteraction(text,cid){
+  const low=text.toLowerCase(),offerHit=S.offers.find(o=>low.includes(o.name.toLowerCase().split(' ')[0])&&low.includes(o.name.toLowerCase().split(' ')[1]||''));
+  let channel='In person';if(/\bcalled|phone|call\b/.test(low))channel='Phone';if(/e-?mail/.test(low))channel='Email';if(/whatsapp/.test(low))channel='WhatsApp';if(/\bsms\b|text message/.test(low))channel='SMS';
+  let outcome='Information shared';if(/declin|not interested/.test(low))outcome='Declined';else if(/call ?back|callback|get back|think about|wants to think|will revert/.test(low))outcome='Awaiting callback';else if(/not available|closed|no answer/.test(low))outcome='Not reachable';else if(/interested|agreed|keen/.test(low))outcome='Interested – follow-up agreed';
+  const sents=sentences(text),nextS=sents.find(s=>/follow|call back|send|collect|revisit|check back/i.test(s));
+  const topic=offerHit?offerHit.name:(sents[0]?clean(sents[0]).split(' ').slice(0,7).join(' '):'Customer discussion');
+  return{customerId:cid,date:lin(now()),channel,topic,outcome,notes:sents.map(clean).join('. ')+'.',nextAction:nextS?clean(nextS):''};
+}
+
+/* ============ shell, router, notifications ============ */
+const NAV=[
+  ['my-day','My Day','sun',['banker','manager']],['meeting-notes','Meeting Notes','notes',['banker','manager']],['visits','Visits','pin',['banker','manager']],
+  ['issues','Customer Issues','alert',['banker','manager']],['paperwork','Paperwork & Processes','clip',['banker','manager']],['outreach','Customer Outreach','mega',['banker','manager','admin']],
+  ['reminders','Reminders','bell',['banker','manager']],['team','Team Overview','users',['manager','admin']],['audit','Audit Trail','shield',['manager','admin']],['settings','Settings','cog',['admin']]];
+const TITLES={'my-day':'My Day','meeting-notes':'Meeting Notes','visits':'Visits','issues':'Customer Issues','paperwork':'Paperwork & Processes','outreach':'Customer Outreach','reminders':'Reminders','team':'Team Overview','audit':'Audit Trail','settings':'Settings','customer':'Customer record'};
+const canOpen=r=>r==='customer'?true:(NAV.find(n=>n[0]===r)||[0,0,0,[]])[3].includes(cur().role);
+const defaultRoute=()=>cur().role==='admin'?'settings':'my-day';
+function parseHash(){const h=location.hash.slice(1);if(h.startsWith('customer-')){ui.route='customer';ui.param=h.slice(9)}else{ui.route=h||defaultRoute();ui.param=null}}
+function go(r,after){ui.after=after||null;if(location.hash==='#'+r){renderAll();runAfter()}else location.hash=r}
+function runAfter(){const f=ui.after;ui.after=null;if(f)setTimeout(f,0)}
+const RLABEL={banker:'Banker',manager:'Manager',admin:'Admin'};
+function renderShell(){
+  const u=cur();
+  $('#side').innerHTML=`<div class="brand"><span class="logo">${ic('bank',18)}</span><span><b>Northgate</b><small>Banker workspace · demo</small></span></div>
+  <nav class="nav" aria-label="Pages">${NAV.filter(n=>n[3].includes(u.role)).map(n=>`${n[0]==='team'?'<div class="sep">Oversight</div>':''}<a href="#${n[0]}" data-nav="${n[0]}">${ic(n[2])}<span>${n[1]}</span></a>`).join('')}</nav>
+  <div class="side-foot">Signed in as ${esc(u.name)}<br>${RLABEL[u.role]} · ${esc(u.branch)}<br>Fictional data only.</div>`;
+  $('#top').innerHTML=`<button class="iconbtn menu-btn" data-act="nav-open" aria-label="Open menu">${ic('menu')}</button><h1 id="ptitle"></h1>
+  <div class="search" role="search"><span class="ic">${ic('search',16)}</span><input id="gsearch" type="search" placeholder="Search customers" aria-label="Global customer search" autocomplete="off"><div class="pop" id="sres" hidden></div></div>
+  <div class="tools"><button class="btn" data-act="assistant">${ic('spark',16)}<span>Assistant</span></button>
+  <button class="iconbtn" data-act="bell" aria-label="Notifications" id="bellbtn">${ic('bell')}<span class="dot" id="belln" hidden></span></button>
+  <div class="pop" id="bellpop" hidden style="right:0;top:42px;width:min(340px,86vw)"></div>
+  <div class="who"><label class="sr" for="userSel">Demo user and role</label><select id="userSel">${S.users.filter(x=>x.active).map(x=>`<option value="${x.id}"${x.id===u.id?' selected':''}>${esc(x.name)} · ${RLABEL[x.role]}</option>`).join('')}</select></div></div>`;
+}
+function notifs(){
+  const u=cur(),n=[];
+  S.reminders.filter(r=>r.status==='active'&&r.ownerId===u.id&&r.at<now()).forEach(r=>n.push({k:'crit',t:'Reminder overdue: '+r.title,go:'reminders'}));
+  S.issues.filter(i=>i.ownerId===u.id&&i.status!=='Resolved'&&i.due<now()+4*HR).forEach(i=>n.push({k:i.due<now()?'crit':'warn',t:(i.due<now()?'TAT passed: ':'TAT within 4 h: ')+cust(i.customerId).name+' · '+i.type,go:'issues'}));
+  S.paperwork.filter(p=>p.ownerId===u.id&&p.due<now()&&p.items.some(i=>!['Verified','Submitted'].includes(i.status))).forEach(p=>n.push({k:'crit',t:'Paperwork past deadline: '+cust(p.customerId).name+' · '+proc(p.processId).title,go:'paperwork'}));
+  S.issues.filter(i=>i.escalatedTo===u.id&&i.status!=='Resolved').forEach(i=>n.push({k:'warn',t:'Escalated to you: '+cust(i.customerId).name+' · '+i.type,go:'issues'}));
+  S.reminders.filter(r=>r.escalatedTo===u.id&&r.status==='active').forEach(r=>n.push({k:'warn',t:'Escalated reminder: '+r.title,go:'reminders'}));
+  S.claims.filter(c=>c.userId!==u.id&&c.expiresAt>now()&&S.pool.some(p=>p.customerId===c.customerId&&p.ownerId===u.id)).forEach(c=>n.push({k:'info',t:uname(c.userId)+' is working on outreach for your customer '+cust(c.customerId).name,go:'outreach'}));
+  return n;
+}
+function renderBell(){const n=notifs(),b=$('#belln');if(!b)return;b.hidden=!n.length;b.textContent=n.length;
+  $('#bellpop').innerHTML=n.length?n.map((x,i)=>`<button class="pi" data-act="notif" data-go="${x.go}">${chip(x.k==='crit'?'Overdue':x.k==='warn'?'Attention':'Info',x.k)} ${esc(x.t)}</button>`).join(''):'<div class="none">No notifications. You are up to date.</div>'}
+function renderAll(){
+  const ae=document.activeElement,fid=ae&&ae.id&&ae.closest('#view')?ae.id:null,ss=fid&&ae.selectionStart!=null?[ae.selectionStart,ae.selectionEnd]:null;
+  if(!S&&!ui.error)return;
+  if(ui.route==='meeting-notes'&&ui.draftId&&S)try{syncDraft()}catch(e){}
+  $('#ptitle').textContent=TITLES[ui.route]||'';
+  $$('[data-nav]').forEach(a=>{a.setAttribute('aria-current',a.dataset.nav===ui.route?'page':'false')});
+  const v=$('#view');
+  if(ui.error){v.innerHTML=`<div class="empty"><b>Something went wrong loading the workspace</b><span>${esc(ui.error)}</span><button class="btn pri" data-act="reset">Reset demo data</button></div>`;return}
+  if(ui.loading){v.innerHTML='<div class="skel"></div><div class="skel"></div><div class="skel"></div>';return}
+  if(!canOpen(ui.route))v.innerHTML=denied();
+  else{try{v.innerHTML=({'my-day':vMyDay,'meeting-notes':vMeeting,'visits':vVisits,'issues':vIssues,'paperwork':vPaperwork,'outreach':vOutreach,'reminders':vReminders,'team':vTeam,'audit':vAudit,'settings':vSettings,'customer':vCustomer}[ui.route]||vNotFound)()}catch(e){console.error(e);v.innerHTML=`<div class="empty"><b>This page could not be displayed</b><span>${esc(e.message)}</span><button class="btn" data-act="reset">Reset demo data</button></div>`}}
+  renderBell();
+  if(fid){const el=document.getElementById(fid);if(el){el.focus();if(ss&&el.setSelectionRange)try{el.setSelectionRange(ss[0],ss[1])}catch(e){}}}
+  if(ui.modal)ui.modal.refresh&&0;
+}
+const denied=()=>`<div class="empty"><b>${ic('shield',28)}<br>You don't have access to this page</b><span>The ${RLABEL[cur().role]} role can't open ${esc(TITLES[ui.route]||'this page')}. Ask an admin if you need access.</span><a class="btn pri" href="#${defaultRoute()}">Go to ${cur().role==='admin'?'Settings':'My Day'}</a></div>`;
+const vNotFound=()=>'<div class="empty"><b>Page not found</b><a class="btn" href="#my-day">Back to My Day</a></div>';
+const vhead=(sub,actions='')=>`<div class="vhead"><p>${sub}</p><div class="row">${actions}</div></div>`;
+const empty=(title,msg,btn='')=>`<div class="empty"><b>${title}</b><span>${msg}</span>${btn}</div>`;
+const custLink=id=>id?`<a href="#customer-${id}">${esc(cust(id).name)}</a>`:'';
+const scope=l=>cur().role==='banker'?l.filter(x=>x.ownerId===cur().id):(ui.filters.owner&&ui.filters.owner!=='all'?l.filter(x=>x.ownerId===ui.filters.owner):l);
+const ownerFilter=()=>isMgr()?`<div class="f"><label for="f-owner">Owner</label><select id="f-owner" data-filter="owner"><option value="all">Whole team</option>${staff().map(u=>`<option value="${u.id}"${ui.filters.owner===u.id?' selected':''}>${esc(u.name)}</option>`).join('')}</select></div>`:'';
+const caseOpen=p=>p.items.filter(i=>!['Verified','Submitted'].includes(i.status));
+
+/* ============ My Day ============ */
+function taskItem(t){
+  const lt={issue:'Issue',paperwork:'Paperwork',visit:'Visit',outreach:'Outreach',customer:'Customer',none:''}[t.linkedType]||'';
+  return `<li class="item"><input type="checkbox" id="tk-${t.id}" data-act="task-done" data-id="${t.id}" aria-label="Mark complete: ${esc(t.title)}">
+  <div class="grow"><div class="t">${esc(t.title)}</div><div class="meta">${dueChip(t.due)}${t.customerId?custLink(t.customerId):''}${lt?chip(lt):''}${t.source!=='manual'?chip('From '+t.source.replace('-',' '),'ai'):''}${t.ownerId!==cur().id?chip('Owner: '+uname(t.ownerId)):''}</div></div>
+  <div class="acts"><button class="btn sm" data-act="task-resched" data-id="${t.id}">Reschedule</button><button class="btn sm" data-act="task-assign" data-id="${t.id}">Assign follow-up</button>${t.linkedType!=='none'&&(t.linkedId||t.customerId)?`<button class="btn sm ghost" data-act="open" data-type="${t.linkedType}" data-id="${t.linkedId||t.customerId}">Open</button>`:''}</div></li>`}
+function vMyDay(){
+  const u=cur(),mine=x=>x.ownerId===u.id;
+  const tasks=S.tasks.filter(t=>mine(t)&&t.status==='open').sort((a,b)=>a.due-b.due);
+  const over=tasks.filter(t=>timeState(t.due)==='overdue'),today=tasks.filter(t=>timeState(t.due)==='today'),up=tasks.filter(t=>timeState(t.due)==='upcoming');
+  const done=S.tasks.filter(t=>mine(t)&&t.status==='done'&&t.doneAt&&sod(t.doneAt)===sod(now()));
+  const vis=S.visits.filter(v=>mine(v)&&v.status==='Planned'&&sod(v.start)<=sod(now())).sort((a,b)=>a.start-b.start);
+  const iss=S.issues.filter(i=>mine(i)&&i.status!=='Resolved').sort((a,b)=>a.due-b.due);
+  const pw=S.paperwork.filter(p=>(mine(p)||p.items.some(i=>i.ownerId===u.id))&&caseOpen(p).length&&p.due<now()+3*DAY).sort((a,b)=>a.due-b.due);
+  const rem=S.reminders.filter(r=>mine(r)&&r.status==='active'&&r.at<=sod(now())+DAY-1).sort((a,b)=>a.at-b.at);
+  const pwOver=pw.filter(p=>p.due<now()).length;
+  const sec=(cls,lab,l)=>l.length?`<div class="grouplabel ${cls}">${lab} · ${l.length}</div><ul class="list">${l.map(taskItem).join('')}</ul>`:'';
+  return `${vhead(`Good ${new Date().getHours()<12?'morning':new Date().getHours()<17?'afternoon':'evening'}, ${esc(u.name.split(' ')[0])}. Here is what is on your plate for ${fmtDW(now())}.`,`<button class="btn pri" data-act="add-task">${ic('plus',16)}Add task</button><button class="btn" data-act="log-interaction">Log interaction</button>`)}
+  <div class="stats"><div class="stat ${over.length?'crit':''}"><b>${over.length}</b><span>Overdue tasks</span></div><div class="stat ${today.length?'warn':''}"><b>${today.length}</b><span>Due today</span></div><div class="stat"><b>${up.length}</b><span>Upcoming</span></div>
+  <div class="stat"><b>${iss.length}</b><span>Open issues</span></div><div class="stat ${pwOver?'crit':''}"><b>${pwOver}</b><span>Paperwork overdue</span></div><div class="stat"><b>${rem.length}</b><span>Reminders due</span></div></div>
+  <div class="grid g2"><div class="card"><header><h2>Tasks</h2><span class="small muted">Overdue, due today and upcoming are labelled separately</span></header>
+    ${tasks.length?sec('over','Overdue',over)+sec('today','Due today',today)+sec('up','Upcoming',up.slice(0,6)):empty('No open tasks','You are clear for now. Add a task or confirm tasks from meeting notes.','<button class="btn" data-act="add-task">Add task</button>')}
+    ${done.length?`<details><summary class="small muted">Completed today (${done.length})</summary><ul class="list">${done.map(t=>`<li class="item"><span aria-hidden="true">${ic('check',16)}</span><div class="grow"><div class="t" style="text-decoration:line-through">${esc(t.title)}</div></div><button class="btn sm" data-act="task-reopen" data-id="${t.id}">Reopen</button></li>`).join('')}</ul></details>`:''}</div>
+  <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+   <div class="card"><header><h2>Target progress</h2></header><div style="display:flex;flex-direction:column;gap:12px">${S.targets.filter(mine).map(g=>`<div><div class="row" style="justify-content:space-between"><span>${esc(g.name)}</span><span class="mono">${g.achieved} of ${g.goal}</span></div><div class="bar" role="progressbar" aria-valuenow="${g.achieved}" aria-valuemin="0" aria-valuemax="${g.goal}" aria-label="${esc(g.name)}"><i style="width:${Math.min(100,g.achieved/g.goal*100)}%"></i></div><div class="small muted">${g.period} · ${Math.max(0,g.goal-g.achieved)} remaining · ${esc(g.source)}</div></div>`).join('')||'<p class="muted">No targets assigned.</p>'}</div>
+    <p class="small muted" style="margin-top:10px">Targets show status only. Customer needs and contact preferences come first.</p></div>
+   <div class="card"><header><h2>Planned visits</h2><a href="#visits" class="small">All visits</a></header>${vis.length?`<ul class="list">${vis.map(v=>`<li class="item"><div class="grow"><div class="t">${custLink(v.customerId)}</div><div class="meta">${chip(v.type)} ${fmtT(v.start)} · ${esc(v.location)}</div></div><button class="btn sm" data-act="visit-edit" data-id="${v.id}">Update</button></li>`).join('')}</ul>`:empty('No visits planned today','','<button class="btn sm" data-act="visit-add">Plan a visit</button>')}</div>
+   <div class="card"><header><h2>Reminders</h2><a href="#reminders" class="small">All</a></header>${rem.length?`<ul class="list">${rem.map(r=>`<li class="item"><div class="grow"><div class="t">${esc(r.title)}</div><div class="meta">${dueChip(r.at)}${r.recur!=='none'?chip('Repeats '+r.recur):''}</div></div><div class="acts"><button class="btn sm" data-act="rem-done" data-id="${r.id}">Complete</button><button class="btn sm" data-act="rem-snooze" data-id="${r.id}">Snooze</button></div></li>`).join('')}</ul>`:empty('No reminders due today','','<button class="btn sm" data-act="rem-add">Set a reminder</button>')}</div></div></div>
+  <div class="grid g2e"><div class="card"><header><h2>Open customer issues</h2><a href="#issues" class="small">Issue tracker</a></header>${iss.length?`<ul class="list">${iss.slice(0,5).map(i=>`<li class="item"><div class="grow"><div class="t">${custLink(i.customerId)} · ${esc(i.type)}</div><div class="meta">${chip(i.status,i.status==='Reopened'?'crit':'info')}${dueChip(i.due,' (TAT)')}</div><div class="small muted">Next: ${esc(i.next||'—')}</div></div><button class="btn sm" data-act="issue-open" data-id="${i.id}">Open</button></li>`).join('')}</ul>`:empty('No open issues','Nice. New issues appear here.')}</div>
+  <div class="card"><header><h2>Paperwork to complete</h2><a href="#paperwork" class="small">All paperwork</a></header>${pw.length?`<ul class="list">${pw.map(p=>`<li class="item"><div class="grow"><div class="t">${custLink(p.customerId)} · ${esc(proc(p.processId).title)}</div><div class="meta">${dueChip(p.due,' (deadline)')}${chip(caseOpen(p).length+' item(s) missing','warn')}</div></div><button class="btn sm" data-act="pw-open" data-id="${p.id}">Open</button></li>`).join('')}</ul>`:empty('No paperwork due soon','')}</div></div>`;
+}
+
+/* ============ Meeting notes + AI drafts ============ */
+const SAMPLE_NOTE=`Lakeview huddle. Anita will call Meera Kulkarni today about the missing proof of address.
+Rohan to visit Kapoor Textiles by Monday to collect the signed mandate form.
+Decided that offer outreach for Festive FD Rates goes through the shared outreach list from now on.
+Sneha should review the two open card dispute issues tomorrow.
+Target for this week is 25 service calls and 6 paperwork closures.
+Remind Anita to check back with Dev Malhotra on the callback next Tuesday.
+Please send the weekly summary to Vikram by Friday.`;
+function setPath(o,p,v){const k=p.split('.');let x=o;for(let i=0;i<k.length-1;i++)x=x[k[i]];x[k[k.length-1]]=v}
+function syncDraft(){const d=S.drafts.find(x=>x.id===ui.draftId);if(!d||d.kind!=='meeting')return d;$$('#view [data-d]').forEach(el=>{try{setPath(d.data,el.dataset.d,el.type==='checkbox'?el.checked:el.value)}catch(e){}});return d}
+const dI=(p,v,l,x='')=>`<input data-d="${p}" value="${esc(v)}" aria-label="${esc(l)}" ${x}>`;
+const dS=(p,o,v,l)=>`<select data-d="${p}" aria-label="${esc(l)}">${opt(o,v)}</select>`;
+const dC=(p,v,l)=>`<input type="checkbox" data-d="${p}" ${v?'checked':''} aria-label="${esc(l)}">`;
+const ownerOpts=()=>staff().map(u=>[u.id,u.name]);
+const custOpts=(blank)=>(blank?[['',blank]]:[]).concat(S.customers.map(c=>[c.id,c.name+' · '+c.ref]));
+function meetingReview(d){
+  const x=d.data,srcBtn=s=>`<div class="src">Source: “${esc(s)}”</div>`;
+  const rows=(arr,fn)=>arr.length?arr.map(fn).join(''):'<p class="muted small">Nothing detected in the notes. You can add items manually.</p>';
+  return `<div class="card" id="review"><header><h2>Review AI draft</h2>${chip('AI draft · not saved','ai')}</header>
+  <div class="banner ai"><span>${ic('spark',16)}</span><div><b>Check each item against the source note.</b> Nothing is saved or assigned until you confirm. Edit, untick or add anything. ${esc(S.settings.aiMode)}.</div></div>
+  <div class="grid" style="margin-top:12px">
+  <div class="f"><label for="d-title">Meeting title</label><input id="d-title" data-d="title" value="${esc(x.title)}"></div>
+  <div class="f"><label for="d-sum">Summary</label><textarea id="d-sum" data-d="summary">${esc(x.summary)}</textarea></div>
+  <div><h3>Decisions and instructions</h3>${rows(x.decisions,(a,i)=>`<div class="item">${dC(`decisions.${i}.keep`,a.keep,'Keep decision')}<div class="grow">${dI(`decisions.${i}.text`,a.text,'Decision text','style="width:100%"')}${srcBtn(a.src)}</div></div>`)}</div>
+  <div><h3>Daily tasks (proposed owners and due dates)</h3>${rows(x.tasks,(a,i)=>`<div class="item">${dC(`tasks.${i}.keep`,a.keep,'Create this task')}<div class="grow" style="display:flex;flex-direction:column;gap:6px">${dI(`tasks.${i}.title`,a.title,'Task title')}<div class="row">${dS(`tasks.${i}.ownerId`,ownerOpts(),a.ownerId,'Owner')}<input type="date" data-d="tasks.${i}.due" value="${a.due}" aria-label="Due date">${dS(`tasks.${i}.customerId`,custOpts('No customer'),a.customerId,'Customer')}${a.assumed?chip('Date not in notes: proposed','assume'):''}</div>${srcBtn(a.src)}</div></div>`)}</div>
+  <div><h3>Targets mentioned</h3>${rows(x.targets,(a,i)=>`<div class="item">${dC(`targets.${i}.keep`,a.keep,'Add this target')}<div class="grow"><div class="row">${dI(`targets.${i}.name`,a.name,'Target name')}<input type="number" min="1" data-d="targets.${i}.goal" value="${a.goal}" aria-label="Target value" style="width:90px"><span class="muted small">${esc(a.period)} · added to ${esc(cur().name.split(' ')[0])}'s targets</span></div>${srcBtn(a.src)}</div></div>`)}</div>
+  <div><h3>Follow-up reminders</h3>${rows(x.reminders,(a,i)=>`<div class="item">${dC(`reminders.${i}.keep`,a.keep,'Create this reminder')}<div class="grow" style="display:flex;flex-direction:column;gap:6px">${dI(`reminders.${i}.title`,a.title,'Reminder text')}<div class="row"><input type="datetime-local" data-d="reminders.${i}.at" value="${a.at}" aria-label="Reminder time">${a.assumed?chip('Time not in notes: proposed','assume'):''}</div>${srcBtn(a.src)}</div></div>`)}</div></div>
+  <div class="mfoot" style="margin-top:12px"><button class="btn" data-act="draft-discard">Discard draft</button><button class="btn" data-act="draft-add-task">Add task row</button><button class="btn pri" data-act="draft-confirm">${ic('check',16)}Confirm and save</button></div></div>`}
+function vMeeting(){
+  const d=S.drafts.find(x=>x.id===ui.draftId&&x.kind==='meeting');
+  const mine=S.drafts.filter(x=>x.createdBy===ui.uid&&x.kind==='meeting'&&x.id!==ui.draftId);
+  const st=ui.filters.src||'Typed notes';
+  const compose=`<div class="card"><header><h2>${d?'Source note':'New meeting note'}</h2>${d?chip('Linked to draft','ai'):''}</header>
+  ${d?`<div class="small muted" style="margin-bottom:6px">${esc(d.sourceType)} · ${esc(d.data.title)}</div><pre class="code" style="white-space:pre-wrap;max-height:420px;overflow:auto">${esc(d.sourceText)}</pre>`:`
+  <form data-form="meeting-draft" class="grid"><div class="fg"><div class="f"><label for="f-title">Title</label><input id="f-title" name="title" value="Lakeview huddle" required></div>
+  <div class="f"><label for="f-src">Source</label><select id="f-src" name="src" data-filter="src"><option${st==='Typed notes'?' selected':''}>Typed notes</option><option${st==='Pasted transcript'?' selected':''}>Pasted transcript</option><option value="Recording"${st==='Recording'?' selected':''}>Recording (not enabled)</option></select></div></div>
+  ${st==='Pasted transcript'?`<label class="row"><input type="checkbox" name="consent" id="f-consent"> <span>All participants were told this meeting is transcribed and agreed. Transcript kept for ${S.settings.transcriptRetentionDays} days, visible to the attendees and managers only.</span></label>`:''}
+  ${st==='Recording'?`<div class="banner warn"><div><b>Audio capture is off.</b> Nothing is ever recorded automatically. An admin must enable capture with an approved transcription service, consent wording and a retention period. Until then, paste a transcript or type notes.</div></div>`:`<div class="f"><label for="f-note">${st==='Typed notes'?'Meeting notes':'Approved transcript'}</label><textarea id="f-note" name="note" rows="12" style="min-height:240px" required placeholder="Type or paste notes. One instruction per line works best.">${esc(ui.filters.note||'')}</textarea></div>`}
+  <div class="mfoot"><button type="button" class="btn" data-act="meeting-sample">Load sample note</button><button class="btn pri" ${st==='Recording'?'disabled':''}>${ic('spark',16)}Draft with AI</button></div></form>`}</div>`;
+  return `${vhead('Turn notes into a summary, tasks, targets and reminders. You review and confirm everything before it is saved or assigned.')}
+  <div class="grid g2e" style="align-items:start">${compose}${d?meetingReview(d):`<div class="card"><header><h2>How drafts work</h2></header><ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px"><li>The draft keeps a link to the note it came from.</li><li>Each task, target and reminder shows the sentence it was taken from.</li><li>Owners and dates the notes did not state are marked as proposed.</li><li>Recording is never started automatically.</li></ul></div>`}</div>
+  ${mine.length?`<div class="card"><header><h2>Your unconfirmed drafts</h2></header><ul class="list">${mine.map(x=>`<li class="item"><div class="grow"><div class="t">${esc(x.data.title)}</div><div class="meta">${chip('AI draft','ai')}${ago(x.createdAt)}</div></div><button class="btn sm" data-act="draft-resume" data-id="${x.id}">Resume</button></li>`).join('')}</ul></div>`:''}
+  <div class="card"><header><h2>Saved meetings</h2></header>${S.meetings.length?`<ul class="list">${S.meetings.slice().sort((a,b)=>b.date-a.date).map(m=>`<li class="item"><div class="grow"><div class="t">${esc(m.title)} <span class="muted small">· ${fmtD(m.date)} · ${esc(m.sourceType)}</span></div><div class="small">${esc(m.summary)}</div><div class="meta">${m.taskIds.length} task(s) · confirmed by ${esc(uname(m.createdBy))}</div></div><div class="acts"><button class="btn sm" data-act="meeting-view" data-id="${m.id}">View source</button><button class="btn sm" data-act="draft-int-meeting" data-id="${m.id}">Draft interaction update</button></div></li>`).join('')}</ul>`:empty('No saved meetings','Draft your first one above.')}</div>`;
+}
+
+/* ============ Visits ============ */
+function vVisits(){
+  const view=ui.filters.vmode||'list',list=scope(S.visits).filter(v=>!ui.filters.vtype||ui.filters.vtype==='all'||v.type===ui.filters.vtype);
+  const m=ui.calMonth||(ui.calMonth=sod(now())),md=new Date(m);md.setDate(1);md.setHours(0,0,0,0);
+  const startGrid=new Date(md);startGrid.setDate(1-((md.getDay()+6)%7));
+  let cal='';
+  if(view==='cal'){cal=`<div class="card"><header><div class="row"><button class="btn sm" data-act="cal-prev" aria-label="Previous month">‹</button><h2 id="calh">${md.toLocaleDateString('en-IN',{month:'long',year:'numeric'})}</h2><button class="btn sm" data-act="cal-next" aria-label="Next month">›</button></div><span class="small muted">Select a day to filter the list</span></header><div class="cal">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="dow">${d}</div>`).join('')}`;
+    for(let i=0;i<42;i++){const d=new Date(startGrid);d.setDate(d.getDate()+i);const t=d.getTime(),vs=list.filter(v=>sod(v.start)===t);
+      cal+=`<button class="day${d.getMonth()!==md.getMonth()?' out':''}${ui.calDay===t?' sel':''}${t===sod(now())?' tdy':''}" data-act="cal-day" data-t="${t}" aria-label="${fmtDW(t)}, ${vs.length} visits"><b>${d.getDate()}</b>${vs.slice(0,2).map(v=>`<span class="ev ${v.type!=='Planned visit'?'u':''}">${esc(cust(v.customerId).name.split(' ')[0])}</span>`).join('')}${vs.length>2?`<span class="small muted">+${vs.length-2}</span>`:''}</button>`}
+    cal+='</div></div>'}
+  const shown=(ui.calDay&&view==='cal'?list.filter(v=>sod(v.start)===ui.calDay):list).sort((a,b)=>a.start-b.start);
+  const planned=shown.filter(v=>v.status==='Planned'),doneV=shown.filter(v=>v.status!=='Planned').reverse();
+  const row=v=>`<tr><td>${fmtDT(v.start)}</td><td>${custLink(v.customerId)}${isMgr()?`<div class="small muted">${esc(uname(v.ownerId))}</div>`:''}</td><td>${chip(v.type,v.type==='Planned visit'?'':'warn')}</td><td>${esc(v.location)}</td><td>${v.status==='Planned'?chip('Planned','info'):v.status==='Cancelled'?chip('Cancelled'):chip(v.outcome||'Completed','ok')}${v.remarks?`<div class="small muted">${esc(v.remarks.slice(0,90))}${v.remarks.length>90?'…':''}</div>`:''}${v.followUp?`<div class="small">Follow-up: ${esc(v.followUp.action)} · ${fmtD(v.followUp.due)}</div>`:''}</td>
+   <td><div class="row"><button class="btn sm" data-act="visit-edit" data-id="${v.id}">${v.status==='Planned'?'Record outcome':'Edit'}</button>${v.status==='Completed'&&v.remarks?`<button class="btn sm" data-act="draft-int-visit" data-id="${v.id}">Draft interaction</button>`:''}</div></td></tr>`;
+  const tbl=(l,e)=>l.length?`<div class="tw"><table><thead><tr><th>When</th><th>Customer</th><th>Type</th><th>Location label</th><th>Outcome</th><th>Actions</th></tr></thead><tbody>${l.map(row).join('')}</tbody></table></div>`:empty(e[0],e[1]);
+  return `${vhead('Record planned visits and unplanned or cold-call visits. Locations are typed by you; the app never tracks your position.',`<button class="btn pri" data-act="visit-add">${ic('plus',16)}Add visit</button>`)}
+  <div class="filters"><div class="seg" role="group" aria-label="View"><button data-act="vmode" data-v="list" aria-pressed="${view==='list'}">List</button><button data-act="vmode" data-v="cal" aria-pressed="${view==='cal'}">Calendar</button></div>
+  <div class="f"><label for="f-vtype">Visit type</label><select id="f-vtype" data-filter="vtype">${opt([['all','All types'],'Planned visit','Unplanned visit','Cold-call visit'],ui.filters.vtype||'all')}</select></div>${ownerFilter()}${ui.calDay&&view==='cal'?`<button class="btn sm" data-act="cal-clear">Clear day filter</button>`:''}</div>
+  ${cal}<h2>Planned</h2>${tbl(planned,['No planned visits','Add a visit to start your calendar.'])}<h2>Completed and cancelled</h2>${tbl(doneV,['No completed visits yet','Open a planned visit and record the outcome.'])}`;
+}
+
+/* ============ Issues ============ */
+const ISTAT=['Open','In Progress','Waiting on Customer','Waiting on Team','Resolved','Reopened'];
+const skind=s=>({'Open':'info','In Progress':'info','Waiting on Customer':'warn','Waiting on Team':'warn','Resolved':'ok','Reopened':'crit'}[s]||'');
+function tatCell(i){if(i.status==='Resolved')return chip('Resolved','ok');const s=i.due<now()?'crit':(i.due-now()<4*HR?'warn':'');return `<div>${fmtDT(i.due)}</div><span class="chip ${s}">${i.due<now()?'⚠ ':''}${remaining(i.due)}</span>`}
+function vIssues(){
+  const f=ui.filters;let l=scope(S.issues);
+  if(f.istat&&f.istat!=='all')l=l.filter(i=>f.istat==='active'?i.status!=='Resolved':i.status===f.istat);else if(!f.istat)l=l.filter(i=>i.status!=='Resolved');
+  if(f.iprio&&f.iprio!=='all')l=l.filter(i=>i.priority===f.iprio);
+  if(f.iq)l=l.filter(i=>(cust(i.customerId).name+i.type+i.desc).toLowerCase().includes(f.iq.toLowerCase()));
+  l=l.slice().sort((a,b)=>(a.status==='Resolved')-(b.status==='Resolved')||a.due-b.due);
+  return `${vhead('Track each issue to resolution. The TAT is the service deadline for the issue type; the history of every change stays on the record.',`<button class="btn pri" data-act="issue-add">${ic('plus',16)}New issue</button>`)}
+  <div class="filters"><div class="f"><label for="f-iq">Search</label><input id="f-iq" data-filter="iq" value="${esc(f.iq||'')}" placeholder="Customer, type or text"></div>
+  <div class="f"><label for="f-istat">Status</label><select id="f-istat" data-filter="istat">${opt([['','Not resolved (default)'],['all','All statuses'],...ISTAT],f.istat||'')}</select></div>
+  <div class="f"><label for="f-iprio">Priority</label><select id="f-iprio" data-filter="iprio">${opt([['all','All'],'High','Medium','Low'],f.iprio||'all')}</select></div>${ownerFilter()}</div>
+  ${l.length?`<div class="tw"><table><thead><tr><th>Customer / issue</th><th>Priority</th><th>Owner</th><th>Status</th><th>TAT / deadline</th><th>Next action</th><th></th></tr></thead><tbody>${l.map(i=>`<tr><td>${custLink(i.customerId)}<div><b>${esc(i.type)}</b></div><div class="small muted">${esc(i.desc.slice(0,80))}${i.desc.length>80?'…':''}</div></td><td>${chip(i.priority,i.priority==='High'?'crit':i.priority==='Medium'?'warn':'')}</td><td>${esc(uname(i.ownerId))}${i.escalatedTo?`<div>${chip('Escalated to '+uname(i.escalatedTo),'warn')}</div>`:''}</td><td>${chip(i.status,skind(i.status))}</td><td>${tatCell(i)}</td><td>${esc(i.next||'—')}${i.nextDue&&i.status!=='Resolved'?`<div class="small muted">${fmtDT(i.nextDue)}</div>`:''}</td><td><button class="btn sm" data-act="issue-open" data-id="${i.id}">Open</button></td></tr>`).join('')}</tbody></table></div>`:empty('No issues match','Change the filters or log a new issue.','<button class="btn" data-act="issue-add">New issue</button>')}`;
+}
+
+/* ============ Paperwork & processes ============ */
+const PST=['Pending','Received','Verified','Submitted'];
+const pkind=s=>({'Pending':'warn','Received':'info','Verified':'ok','Submitted':'ok'}[s]);
+function vPaperwork(){
+  const f=ui.filters;let l=scope(S.paperwork);
+  if((f.pst||'open')==='open')l=l.filter(p=>caseOpen(p).length);else if(f.pst==='done')l=l.filter(p=>!caseOpen(p).length);
+  l=l.slice().sort((a,b)=>a.due-b.due);
+  return `${vhead('Checklists follow the approved process documents. Requirements come from the source document; nothing is added by the app.',`<button class="btn pri" data-act="pw-add">${ic('plus',16)}New checklist</button><button class="btn" data-act="proc-list">Approved process documents</button>`)}
+  <div class="filters"><div class="f"><label for="f-pst">Show</label><select id="f-pst" data-filter="pst">${opt([['open','Incomplete checklists'],['done','Completed'],['all','All']],f.pst||'open')}</select></div>${ownerFilter()}</div>
+  ${l.length?l.map(p=>{const pr=proc(p.processId),open=caseOpen(p),done=p.items.length-open.length;
+   return `<div class="card" id="case-${p.id}"><header><div><h2>${custLink(p.customerId)} · ${esc(pr.title)}</h2><div class="small muted">Owner ${esc(uname(p.ownerId))} · Process TAT: ${esc(pr.tat)}</div></div><div class="row">${dueChip(p.due,' (deadline)')}<button class="btn sm" data-act="proc-open" data-id="${pr.id}">Source: ${esc(pr.title.split('–')[0].trim())} v${pr.version}</button></div></header>
+   <div class="row" style="margin-bottom:10px"><div class="bar grow" role="progressbar" aria-valuenow="${done}" aria-valuemax="${p.items.length}" aria-label="Items complete"><i style="width:${done/p.items.length*100}%"></i></div><span class="mono">${done}/${p.items.length} verified or submitted</span></div>
+   ${open.length?`<div class="banner ${p.due<now()?'crit':'warn'}"><div><b>Still needed before ${fmtDT(p.due)}:</b> ${open.map(i=>esc(i.docName)).join('; ')}.</div></div>`:`<div class="banner ok"><div><b>Checklist complete.</b> All items are verified or submitted.</div></div>`}
+   <div class="tw" style="margin-top:10px"><table><thead><tr><th>Required document or action</th><th>Source</th><th>Status</th><th>Owner</th><th>Next step and reminder</th></tr></thead><tbody>${p.items.map(i=>`<tr><td>${esc(i.docName)}<div class="small muted">${i.type==='doc'?'Document':'Action'}</div></td><td><button class="btn sm ghost" data-act="proc-open" data-id="${pr.id}" data-ref="${i.ref}">${esc(pr.title.split('–')[0].trim())} ${i.ref}</button></td>
+   <td><div class="row" role="group" aria-label="Status for ${esc(i.docName)}">${PST.map(s=>`<button class="btn sm${i.status===s?' pri':''}" data-act="pw-status" data-case="${p.id}" data-item="${i.id}" data-s="${s}" aria-pressed="${i.status===s}">${s==='Pending'?'Pending':s}</button>`).join('')}</div></td>
+   <td>${esc(uname(i.ownerId))}</td><td>${esc(i.next)}<div>${i.reminderId&&S.reminders.find(r=>r.id===i.reminderId&&r.status==='active')?chip('Reminder '+fmtDT(S.reminders.find(r=>r.id===i.reminderId).at),'info'):`<button class="btn sm ghost" data-act="pw-remind" data-case="${p.id}" data-item="${i.id}">Set reminder</button>`}</div></td></tr>`).join('')}</tbody></table></div></div>`}).join(''):empty('No checklists to show','Start a checklist from an approved process document.','<button class="btn" data-act="pw-add">New checklist</button>')}`;
+}
+
+/* ============ Outreach ============ */
+function pairFollowUp(p){const i=checkPair(p.customerId,p.offerId,ui.uid);const ts=S.tasks.filter(t=>t.status==='open'&&t.linkedType==='outreach'&&t.linkedId===p.customerId+'|'+p.offerId).map(t=>t.due);if(i.last&&i.last.nextFollowUp)ts.push(i.last.nextFollowUp);return ts.length?Math.min(...ts):null}
+function vOutreach(){
+  const f=ui.filters,u=cur();
+  let rows=S.pool.map(p=>({p,c:checkPair(p.customerId,p.offerId,u.id),fu:pairFollowUp(p)}));
+  rows=rows.filter(r=>offer(r.p.offerId).active!==false);
+  if(f.oq)rows=rows.filter(r=>(cust(r.p.customerId).name+cust(r.p.customerId).ref).toLowerCase().includes(f.oq.toLowerCase()));
+  if(f.oo&&f.oo!=='all')rows=rows.filter(r=>r.p.offerId===f.oo);
+  if(f.oown&&f.oown!=='all')rows=rows.filter(r=>r.p.ownerId===f.oown);
+  if(f.ost&&f.ost!=='all')rows=rows.filter(r=>f.ost==='In cooldown'?r.c.inCooldown:r.c.status===f.ost);
+  if(f.ofu&&f.ofu!=='all')rows=rows.filter(r=>r.fu&&(f.ofu==='due'?r.fu<=sod(now())+DAY:r.fu<=now()+7*DAY));
+  const mine=S.claims.filter(c=>c.userId===u.id&&c.expiresAt>now());
+  const recent=S.outreachEvents.slice().sort((a,b)=>b.at-a.at).slice(0,6);
+  const sts=['Available','Claimed','Contacted','Awaiting callback','Declined','In cooldown','Do not contact'];
+  return `${vhead('Check what the team has already done before you contact a customer about an offer. A claim reserves the contact so two people never start it at once.',`<span class="chip ai">Live shared status</span><span class="chip assume">Cooldown ${S.settings.cooldownDays}d / declined ${S.settings.declineCooldownDays}d: assumption</span>`)}
+  <div class="banner"><span>${ic('shield',16)}</span><div>Offer lists are based on approved offer rules, not eligibility decisions. Always follow the customer's contact preferences. Contacts about issue resolution are separate and never start or reset an offer cooldown.</div></div>
+  ${mine.length?`<div class="card"><header><h2>Your active claims</h2></header><ul class="list">${mine.map(c=>`<li class="item"><div class="grow"><div class="t">${custLink(c.customerId)} · ${esc(offer(c.offerId).name)}</div><div class="meta">${chip('Claimed by you','info')}hold ends ${fmtT(c.expiresAt)} · ${esc(c.channel)}</div></div><div class="acts"><button class="btn sm pri" data-act="out-log" data-c="${c.customerId}" data-o="${c.offerId}">Log outcome</button><button class="btn sm" data-act="out-release" data-c="${c.customerId}" data-o="${c.offerId}">Release</button></div></li>`).join('')}</ul></div>`:''}
+  <div class="filters"><div class="f"><label for="f-oq">Customer</label><input id="f-oq" data-filter="oq" value="${esc(f.oq||'')}" placeholder="Name or reference"></div>
+  <div class="f"><label for="f-oo">Offer</label><select id="f-oo" data-filter="oo">${opt([['all','All offers'],...S.offers.map(o=>[o.id,o.name])],f.oo||'all')}</select></div>
+  <div class="f"><label for="f-oown">Owner</label><select id="f-oown" data-filter="oown">${opt([['all','Everyone'],...staff().map(x=>[x.id,x.name])],f.oown||'all')}</select></div>
+  <div class="f"><label for="f-ost">Outreach status</label><select id="f-ost" data-filter="ost">${opt([['all','Any status'],...sts],f.ost||'all')}</select></div>
+  <div class="f"><label for="f-ofu">Next follow-up</label><select id="f-ofu" data-filter="ofu">${opt([['all','Any'],['due','Due today or overdue'],['week','Within 7 days']],f.ofu||'all')}</select></div></div>
+  <div class="grid g2" style="align-items:start"><div>${rows.length?`<div class="tw"><table><thead><tr><th>Customer</th><th>Offer</th><th>Owner</th><th>Status and latest team activity</th><th>Next follow-up</th><th></th></tr></thead><tbody>${rows.map(({p,c,fu})=>{const cu=cust(p.customerId),holds=c.claim&&c.claim.userId===u.id;
+    return `<tr><td>${custLink(cu.id)}<div class="small muted">${esc(cu.ref)} · ${esc(cu.segment)}</div></td><td>${esc(offer(p.offerId).name)}<div class="src">${esc(offer(p.offerId).ruleId)} · ${esc(p.basis)}</div></td><td>${esc(uname(p.ownerId))}</td>
+    <td>${chip(holds?'Claimed by you':c.status,holds?'info':statusKind(c.status))}${c.inCooldown&&c.status!=='Claimed'?' '+chip('In cooldown','warn'):''}<div class="small muted">${esc(holds?'Hold ends '+fmtT(c.claim.expiresAt):c.detail||'No contact recorded')}</div></td>
+    <td>${fu?dueChip(fu):'<span class="muted">—</span>'}</td><td>${u.role==='admin'?'<span class="muted small">View only</span>':holds?`<button class="btn sm pri" data-act="out-log" data-c="${cu.id}" data-o="${p.offerId}">Log outcome</button>`:`<button class="btn sm${c.hard?'':' pri'}" data-act="out-check" data-c="${cu.id}" data-o="${p.offerId}">${c.hard?'View':'Check & start'}</button>`}</td></tr>`}).join('')}</tbody></table></div>`:empty('No outreach rows match','Clear a filter to see more customers.')}</div>
+  <div class="card"><header><h2>Latest team activity</h2></header><ul class="tl">${recent.map(e=>`<li class="${e.exception?'x':e.kind==='release'||e.kind==='defer'?'n':''}"><div><b>${esc(uname(e.userId))}</b> · ${esc(e.outcome)}</div><div class="small muted">${custLink(e.customerId)} · ${esc(offer(e.offerId).name)}${e.channel?' · '+esc(e.channel):''} · ${ago(e.at)}${e.exception?' · exception':''}</div></li>`).join('')}</ul></div></div>`;
+}
+
+/* ============ Reminders ============ */
+function vReminders(){
+  const u=cur(),l=S.reminders.filter(r=>isMgr()&&ui.filters.owner&&ui.filters.owner!=='all'?r.ownerId===ui.filters.owner:(isMgr()?true:r.ownerId===u.id));
+  const act=l.filter(r=>r.status==='active').sort((a,b)=>a.at-b.at),over=act.filter(r=>timeState(r.at)==='overdue'),td=act.filter(r=>timeState(r.at)==='today'),up=act.filter(r=>timeState(r.at)==='upcoming'),dn=l.filter(r=>r.status==='done').slice(-5).reverse();
+  const it=r=>{const esc24=r.at<now()-S.settings.escalationHours*HR;return `<li class="item"><div class="grow"><div class="t">${esc(r.title)}</div><div class="meta">${dueChip(r.at)}${chip(r.channel)}${r.recur!=='none'?chip('Repeats '+r.recur):''}${r.linkedType!=='none'&&r.linkedId?`<button class="btn sm ghost" data-act="open" data-type="${r.linkedType}" data-id="${r.linkedId}">Open ${r.linkedType}</button>`:''}${isMgr()?chip(uname(r.ownerId)):''}${r.escalatedTo?chip('Escalated to '+uname(r.escalatedTo),'warn'):esc24&&!r.escalatedTo?chip('Escalation due ('+S.settings.escalationHours+'h)','crit'):''}</div></div>
+   <div class="acts">${r.status==='active'?`<button class="btn sm" data-act="rem-done" data-id="${r.id}">Complete</button><button class="btn sm" data-act="rem-snooze" data-id="${r.id}">Reschedule</button>${r.at<now()&&!r.escalatedTo?`<button class="btn sm" data-act="rem-escalate" data-id="${r.id}">Escalate</button>`:''}`:chip('Done','ok')}</div></li>`};
+  const sec=(c,lab,a)=>a.length?`<div class="grouplabel ${c}">${lab} · ${a.length}</div><ul class="list">${a.map(it).join('')}</ul>`:'';
+  return `${vhead('One-time or repeating reminders for tasks, follow-ups, visits, paperwork, issues and process TATs.',`<button class="btn pri" data-act="rem-add">${ic('plus',16)}New reminder</button>`)}
+  ${isMgr()?`<div class="filters">${ownerFilter()}</div>`:''}
+  <div class="card">${act.length?sec('over','Overdue',over)+sec('today','Due today',td)+sec('up','Upcoming',up):empty('No active reminders','Set a reminder so follow-ups are not missed.','<button class="btn" data-act="rem-add">New reminder</button>')}${dn.length?`<div class="grouplabel up">Recently completed</div><ul class="list">${dn.map(it).join('')}</ul>`:''}</div>
+  <p class="small muted">Reminder channels: In-app is available. Email and SMS need an admin to connect an approved service (not connected in demo mode).</p>`;
+}
+
+/* ============ Customer record ============ */
+function vCustomer(){
+  const c=S.customers.find(x=>x.id===ui.param);if(!c)return empty('Customer not found','Use the search box to find a customer.','<a class="btn" href="#my-day">Back</a>');
+  const vis=x=>isMgr()||x.ownerId===cur().id,hidden=n=>n?`<p class="small muted">${n} item(s) owned by colleagues are hidden by your role's access rules.</p>`:'';
+  const iss=S.issues.filter(i=>i.customerId===c.id),pw=S.paperwork.filter(p=>p.customerId===c.id),vs=S.visits.filter(v=>v.customerId===c.id),rm=S.reminders.filter(r=>r.linkedType==='customer'&&r.linkedId===c.id&&r.status==='active');
+  const ints=S.interactions.filter(x=>x.customerId===c.id).sort((a,b)=>b.date-a.date);
+  const events=S.outreachEvents.filter(e=>e.customerId===c.id).sort((a,b)=>b.at-a.at);
+  const drafts=S.drafts.filter(d=>d.kind==='interaction'&&d.data.customerId===c.id&&d.createdBy===ui.uid);
+  return `${vhead(`${esc(c.ref)} · ${esc(c.segment)} · ${esc(c.branch)} · Relationship owner ${esc(uname(c.ownerId))}`,`<button class="btn pri" data-act="log-interaction" data-c="${c.id}">Log interaction</button><button class="btn" data-act="draft-int-free" data-c="${c.id}">${ic('spark',16)}Draft from notes</button>`)}
+  <div class="row">${c.dnc||c.suppressed?chip('Do not contact for offers','crit'):chip('Offer contact allowed','ok')}${c.channels.length?c.channels.map(x=>chip(x)).join(''):chip('No contact channels','warn')}<span class="small muted">${esc(c.note)}</span></div>
+  <div class="grid g2e" style="align-items:start"><div class="card"><header><h2>Interactions</h2></header>${drafts.length?drafts.map(d=>`<div class="banner ai" style="margin-bottom:8px"><div><b>AI draft awaiting your review</b> · ${ago(d.createdAt)}</div><button class="btn sm" data-act="draft-int-open" data-id="${d.id}">Review</button></div>`).join(''):''}
+   ${ints.length?`<ul class="tl">${ints.map(x=>`<li><div><b>${esc(x.topic)}</b> ${chip(x.channel)}${chip(x.outcome,x.outcome==='Declined'?'crit':'')}${x.kind==='service'?chip('Service','info'):x.kind==='offer'?chip('Offer outreach','warn'):''}${x.source&&x.source.startsWith('ai')?chip('From AI draft, confirmed','ai'):''}</div><div class="small">${esc(x.notes)}</div><div class="small muted">${fmtDT(x.date)} · ${esc(uname(x.ownerId))}${x.nextAction?' · Next: '+esc(x.nextAction):''}</div></li>`).join('')}</ul>`:empty('No interactions logged','Log a conversation or draft one from your notes.')}</div>
+  <div style="display:flex;flex-direction:column;gap:16px;min-width:0"><div class="card"><header><h2>Offer outreach history (shared)</h2></header>${events.length?`<ul class="tl">${events.map(e=>`<li class="${e.kind!=='contact'?'n':''}"><div><b>${esc(uname(e.userId))}</b> · ${esc(e.outcome)}</div><div class="small muted">${esc(offer(e.offerId).name)}${e.channel?' · '+esc(e.channel):''} · ${ago(e.at)}</div>${e.note?`<div class="small">${esc(e.note)}</div>`:''}</li>`).join('')}</ul>`:'<p class="muted">No offer outreach recorded.</p>'}</div>
+  <div class="card"><header><h2>Issues</h2></header>${iss.filter(vis).length?`<ul class="list">${iss.filter(vis).map(i=>`<li class="item"><div class="grow"><div class="t">${esc(i.type)}</div><div class="meta">${chip(i.status,skind(i.status))}${i.status!=='Resolved'?dueChip(i.due,' (TAT)'):''}</div></div><button class="btn sm" data-act="issue-open" data-id="${i.id}">Open</button></li>`).join('')}</ul>`:'<p class="muted">No issues visible.</p>'}${hidden(iss.length-iss.filter(vis).length)}</div>
+  <div class="card"><header><h2>Paperwork and visits</h2></header>${pw.filter(vis).map(p=>`<div class="item"><div class="grow"><div class="t">${esc(proc(p.processId).title)}</div><div class="meta">${dueChip(p.due)}${caseOpen(p).length} missing</div></div><button class="btn sm" data-act="pw-open" data-id="${p.id}">Open</button></div>`).join('')}${vs.filter(vis).map(v=>`<div class="item"><div class="grow"><div class="t">${esc(v.type)} · ${fmtDT(v.start)}</div><div class="meta">${chip(v.status)}${esc(v.outcome)}</div></div><button class="btn sm" data-act="visit-edit" data-id="${v.id}">Open</button></div>`).join('')||''}${!pw.filter(vis).length&&!vs.filter(vis).length?'<p class="muted">Nothing open.</p>':''}${hidden(pw.length+vs.length-pw.filter(vis).length-vs.filter(vis).length)}</div></div></div>`;
+}
+
+/* ============ Team overview, audit ============ */
+function vTeam(){
+  const t=now(),bk=staff().filter(u=>u.role==='banker');
+  const rows=bk.map(u=>{const tk=S.tasks.filter(x=>x.ownerId===u.id&&x.status==='open'),is=S.issues.filter(x=>x.ownerId===u.id&&x.status!=='Resolved'),pw=S.paperwork.filter(p=>p.ownerId===u.id&&caseOpen(p).length);
+    return{u,open:tk.length,over:tk.filter(x=>x.due<t).length,iss:is.length,issOver:is.filter(x=>x.due<t).length,pwOver:pw.filter(p=>p.due<t).length,claims:S.claims.filter(c=>c.userId===u.id&&c.expiresAt>t).length,rem:S.reminders.filter(r=>r.ownerId===u.id&&r.status==='active'&&r.at<t).length}});
+  const max=Math.max(1,...rows.map(r=>r.open+r.iss));
+  const attn=[];S.tasks.filter(x=>x.status==='open'&&x.due<t).forEach(x=>attn.push({k:'Task',t:x.title,o:x.ownerId,due:x.due,type:'task',id:x.id}));
+  S.issues.filter(x=>x.status!=='Resolved'&&x.due<t).forEach(x=>attn.push({k:'Issue',t:cust(x.customerId).name+' · '+x.type,o:x.ownerId,due:x.due,type:'issue',id:x.id}));
+  S.paperwork.filter(p=>caseOpen(p).length&&p.due<t).forEach(p=>attn.push({k:'Paperwork',t:cust(p.customerId).name+' · '+proc(p.processId).title,o:p.ownerId,due:p.due,type:'paperwork',id:p.id}));
+  attn.sort((a,b)=>a.due-b.due);
+  const claims=S.claims.filter(c=>c.expiresAt>t),exc=S.outreachEvents.filter(e=>e.exception&&e.kind==='claim').sort((a,b)=>b.at-a.at).slice(0,5),blocked=S.audit.filter(a=>a.action==='outreach.blocked').length;
+  const esc_=S.issues.filter(i=>i.escalatedTo&&i.status!=='Resolved');
+  return `${vhead('Workload, overdue work and outreach coordination across the team. Overdue means past the due date or TAT, not a performance judgement.')}
+  <div class="stats"><div class="stat ${attn.length?'crit':''}"><b>${attn.length}</b><span>Overdue items</span></div><div class="stat"><b>${S.issues.filter(i=>i.status!=='Resolved').length}</b><span>Open issues</span></div><div class="stat"><b>${claims.length}</b><span>Active outreach claims</span></div><div class="stat"><b>${blocked}</b><span>Duplicate contacts prevented</span></div><div class="stat"><b>${esc_.length}</b><span>Escalated issues</span></div></div>
+  <div class="tw"><table><thead><tr><th>Banker</th><th>Workload</th><th>Open tasks</th><th>Overdue tasks</th><th>Open issues</th><th>Issues past TAT</th><th>Paperwork overdue</th><th>Reminders overdue</th><th>Claims</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.u.name)}</b><div class="small muted">${esc(r.u.branch)}</div></td><td style="min-width:120px"><div class="bar" aria-label="Relative workload"><i style="width:${(r.open+r.iss)/max*100}%"></i></div></td><td class="mono">${r.open}</td><td class="mono">${r.over?chip(r.over,'crit'):0}</td><td class="mono">${r.iss}</td><td class="mono">${r.issOver?chip(r.issOver,'crit'):0}</td><td class="mono">${r.pwOver?chip(r.pwOver,'crit'):0}</td><td class="mono">${r.rem}</td><td class="mono">${r.claims}</td></tr>`).join('')}</tbody></table></div>
+  <div class="grid g2e" style="align-items:start"><div class="card"><header><h2>Overdue items</h2></header>${attn.length?`<ul class="list">${attn.slice(0,10).map(a=>`<li class="item"><div class="grow"><div class="t">${esc(a.t)}</div><div class="meta">${chip(a.k)}${esc(uname(a.o))} · ${dueChip(a.due)}</div></div>${a.type!=='paperwork'?`<button class="btn sm" data-act="reassign" data-type="${a.type}" data-id="${a.id}">Reassign</button>`:`<button class="btn sm" data-act="pw-open" data-id="${a.id}">Open</button>`}</li>`).join('')}</ul>`:empty('Nothing overdue','The team is on track.')}</div>
+  <div style="display:flex;flex-direction:column;gap:16px;min-width:0"><div class="card"><header><h2>Outreach coordination</h2><a class="small" href="#outreach">Open outreach</a></header>${claims.length?`<ul class="list">${claims.map(c=>`<li class="item"><div class="grow"><div class="t">${esc(uname(c.userId))} · ${esc(cust(c.customerId).name)}</div><div class="meta">${esc(offer(c.offerId).name)} · hold ends ${fmtT(c.expiresAt)}</div></div></li>`).join('')}</ul>`:'<p class="muted">No active claims.</p>'}
+  <div class="grouplabel up">Exceptions recorded</div>${exc.length?`<ul class="list">${exc.map(e=>`<li class="item"><div class="grow"><div class="t">${esc(uname(e.userId))} · ${esc(cust(e.customerId).name)}</div><div class="small">${esc(e.note)}</div><div class="meta">${ago(e.at)}</div></div></li>`).join('')}</ul>`:'<p class="muted small">None.</p>'}</div>
+  <div class="card"><header><h2>Escalations</h2></header>${esc_.length?`<ul class="list">${esc_.map(i=>`<li class="item"><div class="grow"><div class="t">${esc(cust(i.customerId).name)} · ${esc(i.type)}</div><div class="meta">To ${esc(uname(i.escalatedTo))} · ${dueChip(i.due,' (TAT)')}</div></div><button class="btn sm" data-act="issue-open" data-id="${i.id}">Open</button></li>`).join('')}</ul>`:'<p class="muted">No escalated issues.</p>'}</div></div></div>`;
+}
+function vAudit(){
+  const f=ui.filters;let l=S.audit;
+  if(f.aent&&f.aent!=='all')l=l.filter(a=>a.entity===f.aent);if(f.auser&&f.auser!=='all')l=l.filter(a=>a.userId===f.auser);if(f.aq)l=l.filter(a=>(a.action+a.detail+a.entityId).toLowerCase().includes(f.aq.toLowerCase()));
+  const ents=[...new Set(S.audit.map(a=>a.entity))];
+  return `${vhead('Every change to interactions, assignments, tasks, issues and outreach is recorded with who, when and what.')}
+  <div class="filters"><div class="f"><label for="f-aq">Search</label><input id="f-aq" data-filter="aq" value="${esc(f.aq||'')}"></div><div class="f"><label for="f-aent">Record type</label><select id="f-aent" data-filter="aent">${opt([['all','All'],...ents],f.aent||'all')}</select></div><div class="f"><label for="f-auser">User</label><select id="f-auser" data-filter="auser">${opt([['all','Everyone'],...S.users.map(u=>[u.id,u.name])],f.auser||'all')}</select></div></div>
+  ${l.length?`<div class="tw"><table><thead><tr><th>When</th><th>User</th><th>Record</th><th>Action</th><th>Detail</th></tr></thead><tbody>${l.slice(0,120).map(a=>`<tr><td class="mono">${fmtDT(a.at)}</td><td>${esc(uname(a.userId))}</td><td>${esc(a.entity)} <span class="mono muted">${esc(a.entityId)}</span></td><td>${chip(a.action,a.action.includes('exception')?'warn':a.action.includes('blocked')?'crit':'')}</td><td>${esc(a.detail)}</td></tr>`).join('')}</tbody></table></div>`:empty('No audit entries match','Try clearing the filters.')}`;
+}
+
+/* ============ Settings (admin) ============ */
+function vSettings(){
+  const tab=ui.tab.settings||'users',st=S.settings;
+  const tabs=[['users','Users & roles'],['processes','Process guidance'],['offers','Offer rules'],['reminders','Reminders & TAT'],['integrations','Integrations'],['privacy','Privacy & AI'],['backend','Backend notes']];
+  let body='';
+  if(tab==='users')body=`<div class="row" style="justify-content:flex-end;margin-bottom:8px"><button class="btn pri" data-act="user-add">${ic('plus',16)}Add user</button></div><div class="tw"><table><thead><tr><th>Name</th><th>Role</th><th>Branch</th><th>Access</th><th>Status</th></tr></thead><tbody>${S.users.map(u=>`<tr><td>${esc(u.name)}</td><td><select data-chg="user-role" data-id="${u.id}" aria-label="Role for ${esc(u.name)}">${opt([['banker','Banker'],['manager','Manager'],['admin','Admin']],u.role)}</select></td><td>${esc(u.branch)}</td><td class="small muted">${u.role==='banker'?'Own tasks, issues, paperwork; shared outreach':u.role==='manager'?'Team data, overdue items, outreach coordination':'Settings, rules, audit, outreach (view)'}</td><td><button class="btn sm" data-act="user-toggle" data-id="${u.id}">${u.active?'Active · Deactivate':'Inactive · Activate'}</button></td></tr>`).join('')}</tbody></table></div>`;
+  if(tab==='processes')body=`<div class="row" style="justify-content:space-between;margin-bottom:8px"><p class="muted">Only Approved documents feed paperwork checklists and the assistant. All documents here are fictional.</p><button class="btn pri" data-act="proc-edit" data-id="">${ic('plus',16)}Add document</button></div><div class="tw"><table><thead><tr><th>Document</th><th>Version</th><th>Status</th><th>TAT</th><th>Required items</th><th></th></tr></thead><tbody>${S.processes.map(p=>`<tr><td>${esc(p.title)}<div class="small muted">${esc(p.owner)}</div></td><td class="mono">${p.version}</td><td>${chip(p.status,p.status==='Approved'?'ok':'warn')}${p.approvedOn?`<div class="small muted">${fmtD(p.approvedOn)}</div>`:''}</td><td>${esc(p.tat)}</td><td>${p.docs.length}</td><td><button class="btn sm" data-act="proc-edit" data-id="${p.id}">Edit</button> <button class="btn sm ghost" data-act="proc-open" data-id="${p.id}">View</button></td></tr>`).join('')}</tbody></table></div>`;
+  if(tab==='offers')body=`<form data-form="set-cooldown" class="card"><header><h2>Duplicate-outreach rules</h2><span class="chip assume">Assumptions: validate before real use</span></header><div class="fg">${fld('Default cooldown after a contact (days)','cd',inp('cd',st.cooldownDays,'type="number" min="0" max="365" required'))}${fld('Cooldown after a decline (days)','dd',inp('dd',st.declineCooldownDays,'type="number" min="0" max="730" required'))}${fld('Claim hold time (minutes)','cm',inp('cm',st.claimMinutes,'type="number" min="5" max="1440" required'),'An unused claim expires after this time.')}</div><div class="mfoot"><button class="btn pri">Save rules</button></div></form>
+  <div class="tw"><table><thead><tr><th>Offer</th><th>Rule</th><th>Audience (approved rule)</th><th>Cooldown override</th><th>Status</th><th></th></tr></thead><tbody>${S.offers.map(o=>`<tr><td>${esc(o.name)}</td><td class="mono">${esc(o.ruleId)}</td><td>${esc(o.audience)}</td><td>${o.cooldownDays!=null?o.cooldownDays+' days':'Default'}</td><td>${chip(o.active?'Active':'Paused',o.active?'ok':'warn')}</td><td><button class="btn sm" data-act="offer-edit" data-id="${o.id}">Edit</button></td></tr>`).join('')}</tbody></table></div>`;
+  if(tab==='reminders')body=`<form data-form="set-rem" class="card"><header><h2>Reminder settings</h2><span class="chip assume">Assumption</span></header><div class="fg">${fld('Escalate overdue items after (hours)','eh',inp('eh',st.escalationHours,'type="number" min="1" required'))}${fld('Default reminder channel','dc',selx('dc',['In-app','Email','SMS'],st.defaultReminderChannel),'Email and SMS stay unavailable until connected.')}${fld('Issue types and service TAT (hours), one per line','it',txa('it',st.issueTypes.map(x=>x.join(' | ')).join('\n'),'rows="7"'),'Format: Type | hours. These are demo assumptions.','full')}</div><div class="mfoot"><button class="btn pri">Save</button></div></form>`;
+  if(tab==='integrations')body=`<div class="banner warn"><div><b>Demo mode.</b> No bank system is connected. Real connections use official APIs with credentials held server-side by an admin. This page never asks for or stores secrets, and it will not show a connection as successful unless a server confirms it.</div></div><div class="tw"><table><thead><tr><th>Integration</th><th>Purpose</th><th>Status</th><th></th></tr></thead><tbody>${st.integrations.map((x,i)=>`<tr><td>${esc(x[0])}</td><td>${esc(x[1])}</td><td>${chip('Demo mode · mock data','warn')}</td><td><button class="btn sm" data-act="int-test" data-i="${i}">Test connection</button> <button class="btn sm" data-act="int-conf" data-i="${i}">Set up</button></td></tr>`).join('')}</tbody></table></div>`;
+  if(tab==='privacy')body=`<form data-form="set-priv" class="card"><header><h2>Recording, transcripts and AI</h2></header><div class="grid"><label class="row"><input type="checkbox" name="audio" ${st.audioCapture?'checked':''}> <span>Allow consented audio capture (requires a connected speech-to-text service; not connected in demo)</span></label><div class="fg">${fld('Transcript retention (days)','tr',inp('tr',st.transcriptRetentionDays,'type="number" min="1" max="365" required'))}${fld('AI drafting mode','ai',inp('ai',st.aiMode,'disabled'),'In production a server-side model is used. All AI output stays a draft until a banker confirms.')}</div></div><div class="mfoot"><button class="btn pri">Save</button></div></form>
+  <div class="card"><header><h2>Reset</h2></header><p class="muted">Restore the fictional starting data for everyone using this browser.</p><div class="mfoot"><button class="btn danger" data-act="reset">Reset demo data</button></div></div>`;
+  if(tab==='backend')body=`<div class="card"><header><h2>Backend readiness</h2></header><p class="muted" style="margin-bottom:10px">This demo keeps data in the browser and simulates a shared server with a version check. A real deployment would use the pattern below. Nothing here is connected.</p>
+  <pre class="code">-- one live claim per customer + offer (conflict-safe)
+create unique index one_live_claim on outreach_claims (customer_id, offer_id)
+  where released_at is null;
+
+-- claim in one transaction: check suppression, cooldown, then insert
+create function claim_outreach(p_customer uuid, p_offer uuid, p_channel text, p_reason text default null)
+returns uuid language plpgsql security definer as $$ ... $$;
+
+-- row-level security
+alter table issues enable row level security;
+create policy issues_read on issues for select
+  using (owner_id = auth.uid() or has_role('manager'));
+
+-- real-time shared status
+-- subscribe clients to outreach_events changes (filtered by RLS)</pre>
+  <ul style="margin:10px 0 0;padding-left:18px"><li>Authentication through the bank's identity provider.</li><li>Audit log written by database triggers, append-only.</li><li>AI calls made from the server with approved data only.</li></ul></div>`;
+  return `${vhead('Manage users, approved process guidance, offer rules, reminder settings and integrations. Every change is written to the audit trail.')}
+  <div class="tabs" role="tablist">${tabs.map(t=>`<button role="tab" aria-selected="${tab===t[0]}" data-act="stab" data-t="${t[0]}">${t[1]}</button>`).join('')}</div>${body}`;
+}
+
+/* ============ Assistant ============ */
+function suggestions(){
+  const u=cur(),t=now(),out=[],held=[];
+  const custs=S.customers.filter(c=>c.ownerId===u.id||S.tasks.some(x=>x.ownerId===u.id&&x.status==='open'&&x.customerId===c.id));
+  custs.forEach(c=>{
+    let score=0;const why=[];
+    S.tasks.filter(x=>x.ownerId===u.id&&x.status==='open'&&x.customerId===c.id).forEach(x=>{const s=timeState(x.due);if(s==='overdue'){score+=3;why.push([`Task overdue: “${x.title}” (due ${fmtDT(x.due)})`,'Task '+x.id])}else if(s==='today'){score+=2;why.push([`Task due today: “${x.title}”`,'Task '+x.id])}else if(x.due<t+2*DAY){score+=1;why.push([`Task due ${fmtDW(x.due)}: “${x.title}”`,'Task '+x.id])}});
+    S.issues.filter(i=>i.ownerId===u.id&&i.customerId===c.id&&i.status!=='Resolved').forEach(i=>{score+=i.due<t?3:1.5;why.push([`Open ${i.type} issue, status ${i.status}. TAT: ${remaining(i.due)}`,'Issue '+i.id])});
+    S.paperwork.filter(p=>p.customerId===c.id&&p.ownerId===u.id&&caseOpen(p).length).forEach(p=>{score+=p.due<t?2.5:1;why.push([`${caseOpen(p).length} paperwork item(s) missing for ${proc(p.processId).title}; deadline ${fmtDT(p.due)}`,'Paperwork '+p.id+' · '+proc(p.processId).title+' v'+proc(p.processId).version])});
+    S.visits.filter(v=>v.customerId===c.id&&v.ownerId===u.id&&v.status==='Planned'&&v.start<t+DAY).forEach(v=>{score+=1.5;why.push([`Visit planned ${fmtDT(v.start)}`,'Visit '+v.id])});
+    const last=S.interactions.filter(x=>x.customerId===c.id).sort((a,b)=>b.date-a.date)[0];
+    if(!last||t-last.date>30*DAY){score+=.5;why.push([last?`No logged interaction for ${Math.floor((t-last.date)/DAY)} days`:'No interaction logged yet','Interaction log'])}
+    let pair=null;
+    S.pool.filter(p=>p.customerId===c.id&&p.ownerId===u.id).forEach(p=>{
+      const chk=checkPair(c.id,p.offerId,u.id),o=offer(p.offerId);
+      if(chk.hard){held.push([c.name,o.name,'Customer has opted out. Not suggested.','Customer preference / suppression flag']);return}
+      if(chk.blocked){held.push([c.name,o.name,chk.reasons[0].msg,'Shared outreach history']);return}
+      if(chk.last&&chk.last.status==='Awaiting callback'&&chk.last.userId===u.id){score+=2;why.push([`You recorded a callback request ${ago(chk.last.at)} for ${o.name}`,'Outreach event'])}
+      const tg=S.targets.find(g=>g.ownerId===u.id&&g.offerId===p.offerId);
+      if(!pair){pair=p.offerId;score+=tg&&tg.achieved<tg.goal?1:.5;why.push([`${o.name} appears on your outreach list under approved rule ${o.ruleId} (${p.basis}). This is a listing rule, not an eligibility decision${tg?`; target status ${tg.achieved} of ${tg.goal}`:''}`,'Offer rule '+o.ruleId])}
+    });
+    if(score>0)out.push({c,score,why,pair,ch:c.channels[0]||null});
+  });
+  return{out:out.sort((a,b)=>b.score-a.score),held};
+}
+const DISC='Suggestions are for planning only. They are not credit, eligibility, pricing or suitability decisions, and never override a customer\'s contact preferences.';
+function botSuggest(){
+  const{out,held}=suggestions();
+  return `<div><b>Customers to connect with next</b></div>${out.length?out.slice(0,4).map(s=>`<div class="card flat" style="padding:10px"><div class="row" style="justify-content:space-between"><b><a href="#customer-${s.c.id}" data-act="assist-close">${esc(s.c.name)}</a></b>${chip(s.ch?'Preferred: '+s.ch:'No channel on file',s.ch?'':'warn')}</div><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px"><div class="small muted">Why suggested</div>${s.why.slice(0,4).map(w=>`<div class="why"><span>${esc(w[0])}</span><span class="src">Source: ${esc(w[1])}</span></div>`).join('')}</div><div class="row" style="margin-top:8px"><button class="btn sm" data-act="assist-open-c" data-c="${s.c.id}">Open record</button>${s.pair?`<button class="btn sm" data-act="out-check" data-c="${s.c.id}" data-o="${s.pair}">Check outreach</button>`:''}</div></div>`).join(''):'<p>No customers stand out today. Check your tasks and reminders.</p>'}
+  ${held.length?`<details><summary class="small">Held back (${held.length})</summary>${held.map(h=>`<div class="why" style="margin-top:6px"><span><b>${esc(h[0])}</b> · ${esc(h[1])}: ${esc(h[2])}</span><span class="src">Source: ${esc(h[3])}</span></div>`).join('')}</details>`:''}
+  <div class="small muted">${DISC}</div>`;
+}
+function botPending(){
+  const u=cur(),iss=S.issues.filter(i=>i.ownerId===u.id&&i.status!=='Resolved').sort((a,b)=>a.due-b.due),rem=S.reminders.filter(r=>r.ownerId===u.id&&r.status==='active').sort((a,b)=>a.at-b.at).slice(0,5),pw=S.paperwork.filter(p=>p.ownerId===u.id&&caseOpen(p).length).sort((a,b)=>a.due-b.due);
+  return `<b>Pending items and deadlines</b><div class="small muted">Issues (TAT)</div>${iss.map(i=>`<div class="why"><span>${esc(cust(i.customerId).name)} · ${esc(i.type)} · ${chip(remaining(i.due),i.due<now()?'crit':'')}</span><span class="src">Source: Issue ${i.id}</span></div>`).join('')||'<p class="small">None.</p>'}<div class="small muted">Paperwork deadlines</div>${pw.map(p=>`<div class="why"><span>${esc(cust(p.customerId).name)} · ${esc(proc(p.processId).title)} · ${chip(remaining(p.due),p.due<now()?'crit':'')} · ${caseOpen(p).length} missing</span><span class="src">Source: ${p.id} · ${esc(proc(p.processId).title)} v${proc(p.processId).version}</span></div>`).join('')||'<p class="small">None.</p>'}<div class="small muted">Reminders</div>${rem.map(r=>`<div class="why"><span>${esc(r.title)} · ${dueChip(r.at)}</span><span class="src">Source: Reminder ${r.id}</span></div>`).join('')||'<p class="small">None.</p>'}`;
+}
+function botProcess(q){
+  const ok=S.processes.filter(p=>p.status==='Approved'),low=(q||'').toLowerCase();
+  const p=ok.find(p=>p.title.toLowerCase().split(/[ –-]+/).filter(w=>w.length>3).some(w=>low.includes(w)));
+  if(!p)return `<b>Which process?</b><div class="small">Approved documents available:</div><div class="row">${ok.map(x=>`<button class="btn sm" data-act="assist-proc" data-id="${x.id}">${esc(x.title)}</button>`).join('')}</div>`;
+  return botProcDoc(p);
+}
+const botProcDoc=p=>`<b>${esc(p.title)}</b><div class="small muted">Approved version ${p.version} · ${fmtD(p.approvedOn)} · TAT ${esc(p.tat)}</div><div class="small">Required documents and actions:</div>${p.docs.map(d=>`<div class="why"><span>${esc(d[0])} <span class="chip">${d[2]==='doc'?'Document':'Action'}</span></span><span class="src">Source: ${esc(p.title)} v${p.version} ${d[1]}</span></div>`).join('')}<button class="btn sm" data-act="proc-open" data-id="${p.id}">Open source document</button><div class="small muted">Summary only. The source document is the authority.</div>`;
+function botDraft(){
+  const{out}=suggestions(),items=out.slice(0,4).map(s=>({title:`Follow up with ${s.c.name}: ${s.why[0][0].replace(/^[^:]+: /,'').slice(0,70)}`,customerId:s.c.id}));
+  const idx=ui.chat.length;ui.chat.push({role:'drafts',items});
+  return `<b>Draft task list for your review</b><div class="small muted">Nothing is added until you press the button.</div>${items.map((x,i)=>`<label class="row"><input type="checkbox" data-dt="${idx}-${i}" checked> <span>${esc(x.title)}</span></label>`).join('')||'<p class="small">No drafts to suggest.</p>'}${items.length?`<button class="btn sm pri" data-act="assist-add-tasks" data-m="${idx}">Review and add selected</button>`:''}<span class="chip ai">AI draft</span>`;
+}
+function assistantReply(q){
+  const low=q.toLowerCase();
+  if(/eligib|qualif|approve|credit|loan limit|price|pricing|interest rate|suitab|should .* buy|best product/.test(low))return `<b>I can't decide that.</b><div>I don't make credit, eligibility, pricing or suitability decisions. Please use the approved product rules and the bank's formal process. I can show the approved process document or help you plan the conversation.</div><button class="btn sm" data-act="assist-q" data-q="Summarize process">Show process documents</button>`;
+  if(/process|document|paperwork requ|required|mandate|nominee|address|summar/.test(low))return botProcess(q);
+  if(/pending|issue|remind|tat|deadline|overdue/.test(low))return botPending();
+  if(/draft|task list|follow.?up note/.test(low))return botDraft();
+  if(/next|connect|who|suggest|call|customer/.test(low))return botSuggest();
+  return `<div>I can suggest who to connect with, summarize approved processes, list pending items and TAT deadlines, and draft task lists for your review.</div>`;
+}
+
+/* ============ modal + drawer infra ============ */
+function openModal(title,body,opts={}){
+  ui.opener=document.activeElement;
+  $('#layer').innerHTML=`<div class="scrim" data-act="scrim"><div class="modal${opts.wide?' wide':''}" role="dialog" aria-modal="true" aria-labelledby="mtitle"><header><h2 id="mtitle">${title}</h2><button class="iconbtn" data-act="modal-close" aria-label="Close dialog">${ic('x')}</button></header><div class="body">${body}</div></div></div>`;
+  const f=$('#layer input:not([type=hidden]):not([disabled]),#layer select,#layer textarea,#layer button.pri');if(f)f.focus();
+}
+function closeModal(){$('#layer').innerHTML='';if(ui.opener&&document.contains(ui.opener))try{ui.opener.focus()}catch(e){}}
+function renderDrawer(){
+  const d=$('#dlayer');if(!ui.assistOpen){d.innerHTML='';return}
+  const msgs=ui.chat.map(m=>m.role==='me'?`<div class="msg me">${esc(m.text)}</div>`:m.role==='bot'?`<div class="msg">${m.html}</div>`:'').join('');
+  d.innerHTML=`<aside class="drawer" role="dialog" aria-label="Banker assistant"><header><div><h2>Assistant</h2><div class="small muted">${esc(S.settings.aiMode)} · uses only data you can access</div></div><button class="iconbtn" data-act="assist-close" aria-label="Close assistant">${ic('x')}</button></header>
+  <div class="chat" id="chat"><div class="msg">I can suggest who to connect with, explain why, summarize approved processes with sources, find pending issues and TATs, and draft tasks for you to review. I don't make credit, eligibility, pricing or suitability decisions.</div>${msgs}</div>
+  <div class="row" style="padding:0 16px 8px">${[['Who should I connect with next?','Who next'],['What is pending or near TAT?','Pending & TAT'],['Summarize an approved process','Process summary'],['Draft a follow-up task list','Draft tasks']].map(x=>`<button class="btn sm" data-act="assist-q" data-q="${esc(x[0])}">${x[1]}</button>`).join('')}</div>
+  <form data-form="assist"><label class="sr" for="aq">Ask the assistant</label><input id="aq" name="q" placeholder="Ask about customers, processes, deadlines" autocomplete="off"><button class="btn pri">Send</button></form></aside>`;
+  const c=$('#chat');if(c)c.scrollTop=c.scrollHeight;
+}
+function ask(q){ui.chat.push({role:'me',text:q});const h=assistantReply(q);ui.chat.push({role:'bot',html:h});ui.assistOpen=true;renderDrawer()}
+
+/* ============ modal builders ============ */
+const staffOpts=()=>staff().map(u=>[u.id,u.name]);
+function addWorkDays(t,n){const d=new Date(t);while(n>0){d.setDate(d.getDate()+1);if(d.getDay()!==0&&d.getDay()!==6)n--}d.setHours(17,30,0,0);return d.getTime()}
+const mf=(label='Save')=>`<div class="mfoot"><button type="button" class="btn" data-act="modal-close">Cancel</button><button class="btn pri">${label}</button></div>`;
+function taskModal(){openModal('Add task',`<form data-form="task-add" class="grid"><div class="fg">${fld('Task','title',inp('title','','required maxlength="140"'),'','full')}${fld('Owner','owner',selx('owner',staffOpts(),ui.uid))}${fld('Due','due',inp('due',lin(at(0,17,30)),'type="datetime-local" required'))}${fld('Customer (optional)','cust',selx('cust',custOpts('No customer'),''),'','full')}</div>${mf('Add task')}</form>`)}
+function visitModal(id,pre){
+  const v=id?S.visits.find(x=>x.id===id):null,x=v||Object.assign({customerId:'c1',type:'Planned visit',start:laterToday(120),location:'',outcome:'',remarks:'',status:'Planned',followUp:null},pre||{});
+  const fu=x.followUp||{};
+  openModal(v?'Update visit':'Add visit',`<form data-form="visit" class="grid"><input type="hidden" name="id" value="${v?v.id:''}"><div class="fg">
+  ${fld('Customer','customerId',selx('customerId',custOpts(),x.customerId))}${fld('Visit type','type',selx('type',['Planned visit','Unplanned visit','Cold-call visit'],x.type),'Use Unplanned or Cold-call for visits that were not scheduled.')}
+  ${fld('Date and time','start',inp('start',lin(x.start),'type="datetime-local" required'))}${fld('Status','status',selx('status',['Planned','Completed','Cancelled'],x.status))}
+  ${fld('Branch, area or location label','location',inp('location',x.location,'required maxlength="80"')+`<button type="button" class="btn sm" data-act="visit-loc" style="align-self:flex-start;margin-top:4px">Share my location once</button>`,'Typed by you. Location is only read if you press the button and allow it. No continuous tracking.','full')}
+  ${fld('Visit outcome','outcome',selx('outcome',[['','Not yet recorded'],'Met · information shared','Met · interested','Met · no action needed','Not available','Declined','Rescheduled'],x.outcome))}
+  ${fld('Remarks','remarks',txa('remarks',x.remarks),'','full')}
+  ${fld('Follow-up action','fuAction',inp('fuAction',fu.action||'','maxlength="140"'),'Creates a task for the owner below.','full')}${fld('Follow-up owner','fuOwner',selx('fuOwner',staffOpts(),fu.ownerId||ui.uid))}${fld('Follow-up due','fuDue',inp('fuDue',din(fu.due||at(1,17)),'type="date"'))}</div>${mf('Save visit')}</form>`,{wide:true});
+}
+function promptDraft(vid){openModal('Visit saved',`<p>Draft an interaction update from this visit's outcome and remarks? It stays an AI draft until you review and confirm it.</p><div class="mfoot"><button class="btn" data-act="modal-close">Not now</button><button class="btn pri" data-act="draft-int-visit" data-id="${vid}">${ic('spark',16)}Draft interaction update</button></div>`)}
+function issueModal(id){
+  const i=S.issues.find(x=>x.id===id);if(!i)return;const ro=!isMgr()&&i.ownerId!==ui.uid;
+  openModal(`${esc(i.type)} · ${esc(cust(i.customerId).name)}`,`<div class="row">${chip(i.status,skind(i.status))}${chip(i.priority+' priority',i.priority==='High'?'crit':'')}${i.status!=='Resolved'?dueChip(i.due,' (TAT)'):''}${i.escalatedTo?chip('Escalated to '+uname(i.escalatedTo),'warn'):''}</div><p>${esc(i.desc)}</p><div class="small muted">Logged ${fmtDT(i.created)} · TAT deadline ${fmtDT(i.due)} · Owner ${esc(uname(i.ownerId))}</div>
+  ${ro?'<div class="banner warn"><div>You can view this issue but only the owner or a manager can change it.</div></div>':`<form data-form="issue-update" class="grid"><input type="hidden" name="id" value="${i.id}"><div class="fg">${fld('Status','status',selx('status',ISTAT,i.status))}${fld('Owner','owner',selx('owner',staffOpts(),i.ownerId))}${fld('Next action','next',inp('next',i.next),'','full')}${fld('Next action due','nextDue',inp('nextDue',i.nextDue?lin(i.nextDue):'','type="datetime-local"'))}${fld('Follow-up note','note',txa('note','','rows="2" placeholder="What happened or what was agreed"'),'Required when status or owner changes.','full')}</div><div class="mfoot"><button type="button" class="btn" data-act="issue-escalate" data-id="${i.id}">Escalate</button><button type="button" class="btn" data-act="rem-add" data-lt="issue" data-lid="${i.id}">Set reminder</button><button class="btn pri">Save update</button></div></form>`}
+  <h3>History</h3><ul class="tl">${i.history.slice().reverse().map(h=>`<li><div><b>${esc(uname(h.by))}</b> ${h.from!==h.to?`${chip(h.from||'New')} → ${chip(h.to,skind(h.to))}`:'added a note'}</div><div class="small">${esc(h.note)}</div><div class="small muted">${fmtDT(h.at)}</div></li>`).join('')}</ul>`,{wide:true});
+}
+function newIssueModal(){const ty=S.settings.issueTypes;openModal('New customer issue',`<form data-form="issue-new" class="grid"><div class="fg">${fld('Customer','customerId',selx('customerId',custOpts(),'c1'))}${fld('Issue type','type',selx('type',ty.map(x=>x[0]),ty[0][0],'data-chg="issue-type"'))}${fld('Description','desc',txa('desc','','required rows="3"'),'','full')}${fld('Priority','priority',selx('priority',['High','Medium','Low'],'Medium'))}${fld('Owner','owner',selx('owner',staffOpts(),ui.uid))}${fld('TAT / service deadline','due',inp('due',lin(now()+ty[0][1]*HR),'type="datetime-local" required'),'Defaults from the issue-type TAT (demo assumption). You can change it.')}${fld('Next action','next',inp('next','','required'))}${fld('Next action due','nextDue',inp('nextDue',lin(laterToday(240)),'type="datetime-local" required'))}</div>${mf('Create issue')}</form>`,{wide:true})}
+function remModal(pre={}){
+  const lt=pre.linkedType||'none',x=Object.assign({title:'',at:at(1,10),recur:'none',channel:S.settings.defaultReminderChannel,ownerId:ui.uid},pre);
+  openModal('New reminder',`<form data-form="rem" class="grid"><input type="hidden" name="item" value="${esc(pre.item||'')}"><div class="fg">${fld('Reminder','title',inp('title',x.title,'required maxlength="140"'),'','full')}
+  ${fld('Linked to','linkedType',selx('linkedType',[['none','Nothing'],['customer','Customer follow-up'],['task','Task'],['visit','Visit'],['paperwork','Paperwork / process TAT'],['issue','Issue TAT']],lt,'data-chg="rem-type"'))}${fld('Record','linkedId',`<select id="f-linkedId" name="linkedId">${remTargets(lt,pre.linkedId)}</select>`)}
+  ${fld('Date and time','at',inp('at',lin(x.at),'type="datetime-local" required'))}${fld('Repeat','recur',selx('recur',[['none','One-time'],['daily','Daily'],['weekly','Weekly'],['monthly','Monthly']],x.recur))}
+  ${fld('Owner','ownerId',selx('ownerId',isMgr()?staffOpts():[[ui.uid,cur().name]],x.ownerId))}${fld('Channel','channel',`<select id="f-channel" name="channel">${['In-app','Email','SMS'].map(c=>`<option value="${c}"${S.settings.channelsConnected[c]?'':' disabled'}${c===x.channel&&S.settings.channelsConnected[c]?' selected':''}>${c}${S.settings.channelsConnected[c]?'':' (not connected)'}</option>`).join('')}</select>`)}</div>${mf('Set reminder')}</form>`);
+}
+function remTargets(type,sel){
+  const mine=x=>isMgr()||x.ownerId===ui.uid;let o=[];
+  if(type==='customer')o=S.customers.map(c=>[c.id,c.name]);else if(type==='task')o=S.tasks.filter(x=>mine(x)&&x.status==='open').map(t=>[t.id,t.title]);else if(type==='visit')o=S.visits.filter(mine).map(v=>[v.id,cust(v.customerId).name+' · '+fmtD(v.start)]);
+  else if(type==='paperwork')o=S.paperwork.filter(mine).map(p=>[p.id,cust(p.customerId).name+' · '+proc(p.processId).title]);else if(type==='issue')o=S.issues.filter(mine).map(i=>[i.id,cust(i.customerId).name+' · '+i.type]);
+  return o.length?opt(o,sel):'<option value="">—</option>'}
+function procModal(id,ref){
+  const p=proc(id);if(!p)return;
+  openModal(esc(p.title),`<div class="row">${chip(p.status,p.status==='Approved'?'ok':'warn')}<span class="mono">v${p.version}</span>${p.approvedOn?`<span class="small muted">Approved ${fmtD(p.approvedOn)}</span>`:''}<span class="small muted">Owner: ${esc(p.owner)}</span></div>
+  <div class="banner"><div>Fictional sample guidance for the demo. In production this text is fetched from the bank's approved process content API.</div></div>
+  <p><b>Process TAT:</b> ${esc(p.tat)}</p>${p.sections.map(s=>`<div class="${s.ref===ref?'banner ai':''}" style="padding:${s.ref===ref?'8px 10px':'0'};border-radius:8px"><b class="mono">${s.ref}</b> ${esc(s.text)}</div>`).join('')}<div class="mfoot"><button class="btn pri" data-act="modal-close">Close</button></div>`);
+}
+function outModal(cid,oid){
+  const c=cust(cid),o=offer(oid),chk=checkPair(cid,oid,ui.uid),adm=cur().role==='admin';
+  const svc=S.interactions.filter(x=>x.customerId===cid&&x.kind==='service').sort((a,b)=>b.date-a.date).slice(0,3);
+  const other=S.outreachEvents.filter(e=>e.customerId===cid&&e.offerId!==oid&&e.kind==='contact').sort((a,b)=>b.at-a.at).slice(0,3);
+  const ch=allowedChannels(c),defDef=chk.cooldownUntil&&chk.cooldownUntil>now()?chk.cooldownUntil:now()+7*DAY;
+  const state=chk.hard?`<div class="banner crit"><div><b>Do not contact.</b> ${chk.reasons[0].msg}</div></div>`:chk.blocked?`<div class="banner warn" role="alert"><div><b>Duplicate outreach warning.</b><ul style="margin:6px 0 0;padding-left:18px">${chk.reasons.map(r=>`<li>${esc(r.msg)}</li>`).join('')}</ul></div></div>`:`<div class="banner ok"><div><b>No conflicting team activity for this offer.</b> ${chk.info.map(esc).join(' ')||'You can claim it and start.'}</div></div>`;
+  openModal(`Outreach check · ${esc(c.name)}`,`<div class="small muted">${esc(o.name)} · rule <span class="mono">${esc(o.ruleId)}</span> · ${esc(o.audience)} <span class="chip assume">This is not an eligibility decision</span></div>${state}
+  <div><h3>Team activity for this customer and offer</h3>${chk.events.length?`<ul class="tl" style="margin-top:8px">${chk.events.slice(0,6).map(e=>`<li class="${e.exception?'x':e.kind==='contact'?'':'n'}"><div><b>${esc(uname(e.userId))}</b> · ${esc(e.outcome)}${e.channel?' · '+esc(e.channel):''}</div><div class="small muted">${fmtDT(e.at)} (${ago(e.at)})${e.exception?' · exception recorded':''}</div>${e.note?`<div class="small">${esc(e.note)}</div>`:''}</li>`).join('')}</ul>`:'<p class="muted">No contact recorded yet.</p>'}</div>
+  <div class="grid g2e"><div><h3>Customer contact preferences</h3><div class="row" style="margin-top:6px">${ch.length?ch.map(x=>chip(x,'ok')).join(''):chip('No channels allowed','crit')}</div><div class="small muted">${esc(c.note)}</div></div>
+  <div><h3>Other offers contacted (info)</h3>${other.length?other.map(e=>`<div class="small">${esc(offer(e.offerId).name)} · ${esc(uname(e.userId))} · ${ago(e.at)}</div>`).join(''):'<div class="small muted">None recent.</div>'}<h3 style="margin-top:8px">Issue-resolution contacts (kept separate)</h3>${svc.length?svc.map(x=>`<div class="small">${esc(x.topic)} · ${ago(x.date)}</div>`).join('')+'<div class="small muted">These do not affect the offer cooldown.</div>':'<div class="small muted">None recent.</div>'}</div></div>
+  ${adm?'<div class="mfoot"><button class="btn pri" data-act="modal-close">Close (view only)</button></div>':`<form id="outform" data-form="none" class="grid"><input type="hidden" name="c" value="${cid}"><input type="hidden" name="o" value="${oid}">
+  ${chk.hard?'<div class="mfoot"><button type="button" class="btn pri" data-act="modal-close">Close</button></div>':`${fld('Channel to use','channel',selx('channel',ch,ch[0]||'','')+'',ch.length?'Only channels the customer allows are listed.':'This customer has no allowed channel.')}
+  ${!chk.blocked?`<div class="mfoot"><button type="button" class="btn" data-act="out-sim" data-c="${cid}" data-o="${oid}">Demo: a teammate claims this now</button><button type="button" class="btn pri" data-act="out-claim" ${ch.length?'':'disabled'}>Claim and start outreach</button></div>`:
+  `<div class="grid g2e"><div class="card flat"><h3>Defer the contact</h3><div class="fg" style="margin-top:8px">${fld('Revisit on','defer',inp('defer',din(defDef),'type="date"'))}${fld('Note (optional)','dnote',inp('dnote',''))}</div><div class="mfoot"><button type="button" class="btn pri" data-act="out-defer">Defer and add task</button></div></div>
+  <div class="card flat"><h3>Record an exception</h3><p class="small muted">Only when contact is genuinely necessary. Recorded in the audit history and visible to the team.</p><div class="fg" style="margin-top:8px">${fld('Category','cat',selx('cat',['Customer asked us to call','Time-sensitive reason','Previous contact was incomplete','Other approved reason']))}${fld('Reason (min. 10 characters)','reason',txa('reason','','rows="2"'),'','full')}</div><label class="row small"><input type="checkbox" name="ack" id="f-ack"> I understand this exception is audited.</label><div class="mfoot"><button type="button" class="btn danger" data-act="out-exception" ${ch.length?'':'disabled'}>Claim with exception</button></div></div></div>`}`}</form>`}`,{wide:true});
+}
+function outLogModal(cid,oid){openModal(`Log outcome · ${esc(cust(cid).name)}`,`<form data-form="out-log" class="grid"><input type="hidden" name="c" value="${cid}"><input type="hidden" name="o" value="${oid}"><div class="small muted">${esc(offer(oid).name)}</div><div class="fg">${fld('Channel used','channel',selx('channel',allowedChannels(cust(cid)),(S.claims.find(x=>x.customerId===cid&&x.offerId===oid&&x.userId===ui.uid)||{}).channel))}${fld('Outcome','outcome',selx('outcome',['Information shared','Interested – follow-up agreed','Awaiting callback','Declined','Not reachable']))}${fld('Notes','notes',txa('notes','','required rows="3"'),'','full')}${fld('Next follow-up date','next',inp('next','','type="date"'),'Required for Awaiting callback or follow-up agreed.')}</div>${mf('Save outcome')}</form>`)}
+function interactionModal(cid){openModal('Log interaction',`<form data-form="interaction" class="grid"><div class="fg">${fld('Customer','customerId',selx('customerId',custOpts(),cid||'c1'))}${fld('Date and time','date',inp('date',lin(now()),'type="datetime-local" required'))}${fld('Channel','channel',selx('channel',[...CHANNELS,'Meeting'],'Phone'))}${fld('Topic','topic',inp('topic','','required maxlength="100"'))}${fld('Outcome','outcome',selx('outcome',['Information shared','Interested – follow-up agreed','Awaiting callback','Declined','Not reachable','Other']))}${fld('Next action','nextAction',inp('nextAction',''))}${fld('Notes','notes',txa('notes','','required rows="3"'),'To record offer outreach so the team sees it, use Customer Outreach instead.','full')}</div>${mf('Save interaction')}</form>`)}
+function draftIntModal(id){
+  const d=S.drafts.find(x=>x.id===id);if(!d)return;const x=d.data,offerHit=S.offers.find(o=>o.name===x.topic);
+  openModal('Review AI-drafted interaction',`<div class="grid g2e" style="align-items:start"><div><h3>Source (${esc(d.sourceType)})</h3><pre class="code" style="white-space:pre-wrap;max-height:340px;overflow:auto;margin-top:6px">${esc(d.sourceText)}</pre><div class="small muted">Linked source: ${esc(d.sourceType)} ${esc(d.sourceId||'')}. Check the draft against this text.</div></div>
+  <form data-form="int-confirm" class="grid"><input type="hidden" name="id" value="${d.id}"><div class="banner ai"><div>${chip('AI draft · not saved','ai')} Nothing is written to the customer record until you confirm.</div></div>
+  ${offerHit?'<div class="banner warn"><div>This looks like offer outreach. Record it through Customer Outreach so the team sees it and cooldowns apply. Saving here logs a general interaction only.</div></div>':''}
+  <div class="fg">${fld('Customer','customerId',selx('customerId',custOpts(),x.customerId))}${fld('Date and time','date',inp('date',x.date,'type="datetime-local" required'))}${fld('Channel','channel',selx('channel',[...CHANNELS,'Meeting'],x.channel))}${fld('Outcome','outcome',selx('outcome',['Information shared','Interested – follow-up agreed','Awaiting callback','Declined','Not reachable','Other'],x.outcome))}${fld('Topic','topic',inp('topic',x.topic,'required'),'','full')}${fld('Notes','notes',txa('notes',x.notes,'rows="4" required'),'','full')}${fld('Next action','nextAction',inp('nextAction',x.nextAction),'','full')}</div>
+  <div class="mfoot"><button type="button" class="btn danger" data-act="int-discard" data-id="${d.id}">Discard draft</button><button type="button" class="btn" data-act="modal-close">Decide later</button><button class="btn pri">${ic('check',16)}Confirm and save</button></div></form></div>`,{wide:true});
+}
+function makeIntDraft(cid,text,type,sid,date){
+  const data=aiInteraction(text,cid);if(date)data.date=lin(date);
+  const d={id:uid('d'),kind:'interaction',sourceType:type,sourceId:sid,sourceText:text,createdBy:ui.uid,createdAt:now(),data};
+  Server.tx(s=>{s.drafts.push(d);audit('draft',d.id,'draft.created','AI interaction draft from '+type+' '+(sid||'')+' for '+cust(cid).name+'. Not saved to the customer record.')});
+  renderAll();draftIntModal(d.id);
+}
+function pickCustModal(title,sel,extra){openModal(title,`<form data-form="int-pick" class="grid"><input type="hidden" name="extra" value="${esc(extra)}">${fld('Customer','customerId',selx('customerId',custOpts(),sel))}${mf('Draft with AI')}</form>`)}
+
+/* ============ actions ============ */
+const taskById=id=>S.tasks.find(t=>t.id===id);
+const acts={
+  'nav-open'(){document.body.classList.add('nav-open')},'nav-close'(){document.body.classList.remove('nav-open')},
+  scrim(el,e){if(e.target===el)closeModal()},'modal-close'(){closeModal()},
+  assistant(){ui.assistOpen=true;renderDrawer();const q=$('#aq');q&&q.focus()},'assist-close'(){ui.assistOpen=false;renderDrawer()},
+  'assist-q'(el){ask(el.dataset.q)},'assist-open-c'(el){ui.assistOpen=false;renderDrawer();go('customer-'+el.dataset.c)},
+  'assist-proc'(el){ui.chat.push({role:'bot',html:botProcDoc(proc(el.dataset.id))});renderDrawer()},
+  'assist-add-tasks'(el){const idx=+el.dataset.m,m=ui.chat[idx];const picked=$$('[data-dt^="'+idx+'-"]').filter(c=>c.checked).map(c=>m.items[+c.dataset.dt.split('-')[1]]);
+    if(!picked.length){toast('Tick at least one task to add.');return}
+    mutate(s=>{picked.forEach(p=>{const id=uid('t');s.tasks.push({id,title:p.title,ownerId:ui.uid,due:at(1,17,30),status:'open',customerId:p.customerId,linkedType:'customer',linkedId:p.customerId,source:'assistant draft',createdBy:ui.uid});audit('task',id,'task.create','Created from assistant draft after banker review.')})},picked.length+' task(s) added after your review.')},
+  bell(){const p=$('#bellpop');p.hidden=!p.hidden},notif(el){$('#bellpop').hidden=true;go(el.dataset.go)},
+  reset(){S=seed();Server.save(S);ui.draftId=null;ui.error=null;ui.loading=false;ui.filters={};closeModal();renderShell();go(defaultRoute());toast('Demo data restored.')},
+  /* tasks */
+  'add-task'(){taskModal()},
+  'task-done'(el){const id=el.dataset.id;mutate(s=>{const t=taskById(id);t.status='done';t.doneAt=now();audit('task',id,'task.complete',t.title)},'Task completed.',()=>mutate(s=>{const t=taskById(id);t.status='open';delete t.doneAt;audit('task',id,'task.reopen','Undo: '+t.title)}))},
+  'task-reopen'(el){mutate(s=>{const t=taskById(el.dataset.id);t.status='open';delete t.doneAt;audit('task',t.id,'task.reopen',t.title)},'Task reopened.')},
+  'task-resched'(el){const t=taskById(el.dataset.id);openModal('Reschedule task',`<form data-form="task-resched" class="grid"><input type="hidden" name="id" value="${t.id}"><p>${esc(t.title)}</p><div class="fg">${fld('New due date and time','due',inp('due',lin(t.due<now()?laterToday(120):t.due),'type="datetime-local" required'))}${fld('Reason (optional)','reason',inp('reason',''))}</div>${mf('Reschedule')}</form>`)},
+  'task-assign'(el){const t=taskById(el.dataset.id);openModal('Assign a follow-up',`<form data-form="task-assign" class="grid"><input type="hidden" name="id" value="${t.id}"><div class="fg">${fld('Follow-up task','title',inp('title','Follow up: '+t.title.slice(0,90),'required'),'','full')}${fld('Assign to','owner',selx('owner',staffOpts(),t.ownerId))}${fld('Due','due',inp('due',lin(at(1,17,30)),'type="datetime-local" required'))}</div>${mf('Assign follow-up')}</form>`)},
+  open(el){const{type,id}=el.dataset;
+    if(type==='customer')go('customer-'+id);else if(type==='issue')go('issues',()=>issueModal(id));else if(type==='paperwork')acts['pw-open']({dataset:{id}});else if(type==='visit')go('visits',()=>visitModal(id));
+    else if(type==='outreach'){const[c,o]=id.split('|');go('outreach',()=>outModal(c,o))}},
+  'log-interaction'(el){interactionModal(el.dataset&&el.dataset.c)},
+  /* visits */
+  'visit-add'(){visitModal(null)},'visit-edit'(el){visitModal(el.dataset.id)},
+  'visit-loc'(){if(!navigator.geolocation){toast('Location is not available here. Type a label instead.');return}
+    navigator.geolocation.getCurrentPosition(p=>{$('#f-location').value='Shared once (approx. '+p.coords.latitude.toFixed(2)+', '+p.coords.longitude.toFixed(2)+')'},()=>toast('Location permission was not given. Type a label instead.'),{timeout:6000})},
+  vmode(el){ui.filters.vmode=el.dataset.v;renderAll()},'cal-prev'(){const d=new Date(ui.calMonth);d.setMonth(d.getMonth()-1);ui.calMonth=d.getTime();renderAll()},'cal-next'(){const d=new Date(ui.calMonth);d.setMonth(d.getMonth()+1);ui.calMonth=d.getTime();renderAll()},
+  'cal-day'(el){ui.calDay=+el.dataset.t;renderAll()},'cal-clear'(){ui.calDay=null;renderAll()},
+  'draft-int-visit'(el){const v=S.visits.find(x=>x.id===el.dataset.id);closeModal();makeIntDraft(v.customerId,(v.outcome?v.outcome+'. ':'')+v.remarks,'Visit',v.id,v.start)},
+  'draft-int-meeting'(el){pickCustModal('Draft interaction from meeting','c1','meeting:'+el.dataset.id)},
+  'draft-int-free'(el){const c=el.dataset.c;openModal('Draft interaction from your notes',`<form data-form="int-free" class="grid"><input type="hidden" name="customerId" value="${c}">${fld('Your notes or approved transcript','text',txa('text','','required rows="6" placeholder="e.g. Called Meera about the card dispute. She is waiting to hear back from the cards team."'),'The AI drafts the fields. You review and confirm before anything is saved.')}${mf('Draft with AI')}</form>`)},
+  'draft-int-open'(el){draftIntModal(el.dataset.id)},
+  'int-discard'(el){mutate(s=>{s.drafts=s.drafts.filter(d=>d.id!==el.dataset.id);audit('draft',el.dataset.id,'draft.discard','AI interaction draft discarded.')},'Draft discarded.');closeModal()},
+  /* meeting notes */
+  'meeting-sample'(){ui.filters.note=SAMPLE_NOTE;ui.filters.src='Typed notes';renderAll()},
+  'draft-resume'(el){ui.draftId=el.dataset.id;renderAll()},
+  'draft-discard'(){const id=ui.draftId;mutate(s=>{s.drafts=s.drafts.filter(d=>d.id!==id);audit('draft',id,'draft.discard','Meeting draft discarded.')},'Draft discarded. Nothing was saved.');ui.draftId=null;renderAll()},
+  'draft-add-task'(){const d=syncDraft();d.data.tasks.push({title:'',ownerId:ui.uid,due:din(at(1,17)),assumed:false,customerId:'',src:'Added manually',keep:true});renderAll()},
+  'draft-confirm'(){
+    const d=syncDraft();if(!d)return;const x=d.data;const n=x.tasks.filter(t=>t.keep).length,g=x.targets.filter(t=>t.keep&&+t.goal>0).length,r=x.reminders.filter(t=>t.keep&&t.at).length;
+    if(!x.title.trim()){toast('Give the meeting a title first.');return}
+    const bad=x.tasks.find(t=>t.keep&&(!t.title.trim()||!t.due));if(bad){toast('Each task you keep needs a title and due date.');return}
+    mutate(s=>{const mid=uid('m'),tids=[];
+      x.tasks.filter(t=>t.keep).forEach(t=>{const id=uid('t');tids.push(id);s.tasks.push({id,title:t.title.trim(),ownerId:t.ownerId,due:fromD(t.due),status:'open',customerId:t.customerId||null,linkedType:t.customerId?'customer':'none',linkedId:t.customerId||null,source:'meeting',createdBy:ui.uid,meetingId:mid});audit('task',id,'task.assign',`From meeting "${x.title}" assigned to ${uname(t.ownerId)}`)});
+      x.targets.filter(t=>t.keep&&+t.goal>0).forEach(t=>{const id=uid('g');s.targets.push({id,ownerId:ui.uid,name:t.name,achieved:0,goal:+t.goal,period:t.period,source:'Meeting: '+x.title,kind:'service',offerId:null});audit('target',id,'target.create',t.name+' '+t.goal)});
+      x.reminders.filter(t=>t.keep&&t.at).forEach(t=>{const id=uid('r');s.reminders.push({id,title:t.title,ownerId:ui.uid,at:fromL(t.at),recur:'none',channel:'In-app',linkedType:'none',linkedId:null,status:'active',escalatedTo:null});audit('reminder',id,'reminder.create','From meeting '+x.title)});
+      s.meetings.push({id:mid,title:x.title,date:now(),sourceType:d.sourceType,sourceText:d.sourceText,summary:x.summary,decisions:x.decisions.filter(q=>q.keep).map(q=>q.text),taskIds:tids,createdBy:ui.uid,confirmedAt:now()});
+      s.drafts=s.drafts.filter(q=>q.id!==d.id);audit('meeting',mid,'meeting.confirm',`Confirmed AI draft ${d.id}: ${n} task(s), ${g} target(s), ${r} reminder(s).`)},`Saved. ${n} task(s), ${g} target(s) and ${r} reminder(s) created.`);
+    ui.draftId=null;ui.filters.note='';renderAll()},
+  'meeting-view'(el){const m=S.meetings.find(x=>x.id===el.dataset.id);openModal('Source note · '+esc(m.title),`<div class="small muted">${esc(m.sourceType)} · ${fmtD(m.date)}</div><pre class="code" style="white-space:pre-wrap">${esc(m.sourceText)}</pre><div class="mfoot"><button class="btn pri" data-act="modal-close">Close</button></div>`)},
+  /* issues */
+  'issue-add'(){newIssueModal()},'issue-open'(el){issueModal(el.dataset.id)},
+  'issue-escalate'(el){const i=S.issues.find(x=>x.id===el.dataset.id);openModal('Escalate issue',`<form data-form="issue-escalate" class="grid"><input type="hidden" name="id" value="${i.id}"><div class="fg">${fld('Escalate to','to',selx('to',S.users.filter(u=>u.role==='manager'&&u.active).map(u=>[u.id,u.name]),'u4'))}${fld('Reason','reason',txa('reason','','required rows="3"'),'','full')}</div>${mf('Escalate')}</form>`)},
+  /* paperwork */
+  'pw-open'(el){ui.filters.pst='all';go('paperwork',()=>{const e=document.getElementById('case-'+el.dataset.id);if(e){e.scrollIntoView({block:'start'});e.style.outline='2px solid var(--accent)'}})},
+  'pw-add'(){const ap=S.processes.filter(p=>p.status==='Approved'&&p.docs.length);openModal('New paperwork checklist',`<form data-form="pw-new" class="grid"><div class="fg">${fld('Customer','customerId',selx('customerId',custOpts(),'c1'))}${fld('Approved process','processId',selx('processId',ap.map(p=>[p.id,p.title+' v'+p.version]),ap[0].id),'Items come from the approved document.')}${fld('Owner','owner',selx('owner',staffOpts(),ui.uid))}${fld('Deadline','due',inp('due',din(addWorkDays(now(),ap[0].tatDays||5)),'type="date" required'),'Defaults to the process TAT in working days.')}</div>${mf('Create checklist')}</form>`)},
+  'pw-status'(el){const{case:cid,item,s:st}=el.dataset;mutate(s=>{const p=s.paperwork.find(x=>x.id===cid),i=p.items.find(x=>x.id===item),old=i.status;i.status=st;audit('paperwork',cid,'paperwork.status',`${i.docName}: ${old} → ${st}`)},`Marked ${st.toLowerCase()}.`)},
+  'pw-remind'(el){const p=S.paperwork.find(x=>x.id===el.dataset.case),i=p.items.find(x=>x.id===el.dataset.item);remModal({title:`Paperwork: ${i.docName} for ${cust(p.customerId).name}`,linkedType:'paperwork',linkedId:p.id,at:Math.min(at(1,10),p.due-HR),item:p.id+'|'+i.id})},
+  'proc-open'(el){procModal(el.dataset.id,el.dataset.ref)},
+  'proc-list'(){openModal('Approved process documents',`<ul class="list">${S.processes.filter(p=>p.status==='Approved').map(p=>`<li class="item"><div class="grow"><div class="t">${esc(p.title)}</div><div class="meta"><span class="mono">v${p.version}</span> · approved ${fmtD(p.approvedOn)} · TAT ${esc(p.tat)}</div></div><button class="btn sm" data-act="proc-open" data-id="${p.id}">View</button></li>`).join('')}</ul>`)},
+  /* outreach */
+  'out-check'(el){if(ui.assistOpen){ui.assistOpen=false;renderDrawer()}outModal(el.dataset.c,el.dataset.o)},
+  'out-log'(el){outLogModal(el.dataset.c,el.dataset.o)},
+  'out-release'(el){Out.release(el.dataset.c,el.dataset.o);toast('Claim released.');renderAll()},
+  'out-claim'(){const f=$('#outform'),d=Object.fromEntries(new FormData(f)),r=Out.claim(d.c,d.o,d.channel);outResult(r,d)},
+  'out-exception'(){const f=$('#outform'),d=Object.fromEntries(new FormData(f));
+    if((d.reason||'').trim().length<10){toast('Enter a reason of at least 10 characters.');$('#f-reason').focus();return}
+    if(!d.ack){toast('Tick the box to confirm the exception will be audited.');return}
+    outResult(Out.claim(d.c,d.o,d.channel,{category:d.cat,reason:d.reason.trim()}),d)},
+  'out-defer'(){const f=$('#outform'),d=Object.fromEntries(new FormData(f));if(!d.defer){toast('Choose a date to revisit.');return}
+    Out.defer(d.c,d.o,fromD(d.defer),d.dnote);closeModal();renderAll();toast('Contact deferred. A task was added for '+fmtD(fromD(d.defer))+'.')},
+  'out-sim'(el){const other=S.users.find(u=>u.role==='banker'&&u.id!==ui.uid&&u.active),prev=ui.uid;ui.uid=other.id;
+    const cu=cust(el.dataset.c);Out.claim(el.dataset.c,el.dataset.o,cu.channels[0]||'Phone');ui.uid=prev;renderAll();toast(`Demo: ${other.name.split(' ')[0]} claimed this just now. This window hasn't refreshed. Press Claim to see the server stop the duplicate.`)},
+  /* reminders */
+  'rem-add'(el){const d=el.dataset||{};if(d.lt){closeModal()}remModal(d.lt?{linkedType:d.lt,linkedId:d.lid,title:d.lt==='issue'?'Check TAT: '+cust(S.issues.find(i=>i.id===d.lid).customerId).name:''}:{})},
+  'rem-done'(el){const id=el.dataset.id;let msg='Reminder completed.';mutate(s=>{const r=s.reminders.find(x=>x.id===id);
+    if(r.recur!=='none'){const step={daily:1,weekly:7,monthly:30}[r.recur]*DAY;let n=r.at;do{n+=step}while(n<=now());r.at=n;msg='Completed. Next reminder '+fmtDT(n)+'.';audit('reminder',id,'reminder.complete','Recurring; next '+fmtDT(n))}
+    else{r.status='done';audit('reminder',id,'reminder.complete',r.title)}},msg)},
+  'rem-snooze'(el){openModal('Reschedule reminder',`<form data-form="rem-snooze" class="grid"><input type="hidden" name="id" value="${el.dataset.id}">${fld('New time','at',inp('at',lin(Math.max(now()+HR,S.reminders.find(r=>r.id===el.dataset.id).at)),'type="datetime-local" required'))}<div class="row"><button type="button" class="btn sm" data-act="snooze-set" data-h="1">In 1 hour</button><button type="button" class="btn sm" data-act="snooze-set" data-h="tom">Tomorrow 9 am</button></div>${mf('Reschedule')}</form>`)},
+  'snooze-set'(el){$('#f-at').value=lin(el.dataset.h==='tom'?at(1,9):now()+HR)},
+  'rem-escalate'(el){mutate(s=>{const r=s.reminders.find(x=>x.id===el.dataset.id);r.escalatedTo='u4';audit('reminder',r.id,'reminder.escalate','Overdue reminder escalated to Vikram Shah.')},'Escalated to the manager.')},
+  reassign(el){const{type,id}=el.dataset,rec=type==='task'?taskById(id):S.issues.find(i=>i.id===id);openModal('Reassign '+type,`<form data-form="reassign" class="grid"><input type="hidden" name="type" value="${type}"><input type="hidden" name="id" value="${id}"><p>${esc(type==='task'?rec.title:cust(rec.customerId).name+' · '+rec.type)}</p>${fld('New owner','owner',selx('owner',S.users.filter(u=>u.role==='banker'&&u.active).map(u=>[u.id,u.name]),rec.ownerId))}${fld('Reason','reason',inp('reason','','required'))}${mf('Reassign')}</form>`)},
+  /* settings */
+  stab(el){ui.tab.settings=el.dataset.t;renderAll()},
+  'user-add'(){openModal('Add user (fictional)',`<form data-form="user-add" class="grid"><div class="fg">${fld('Name','name',inp('name','','required'))}${fld('Role','role',selx('role',[['banker','Banker'],['manager','Manager'],['admin','Admin']],'banker'))}${fld('Branch','branch',inp('branch','Lakeview Branch','required'),'','full')}</div><p class="small muted">Use a fictional name. No real identity details.</p>${mf('Add user')}</form>`)},
+  'user-toggle'(el){if(el.dataset.id===ui.uid){toast('You cannot deactivate yourself.');return}mutate(s=>{const u=user(el.dataset.id);u.active=!u.active;audit('user',u.id,'user.access',u.name+(u.active?' activated':' deactivated'))},'User updated.');renderShell()},
+  'proc-edit'(el){const p=el.dataset.id?proc(el.dataset.id):{id:'',title:'',version:'1.0',status:'Draft',tat:'',tatDays:5,docs:[],sections:[]};
+    openModal(p.id?'Edit process document':'Add process document',`<form data-form="proc-edit" class="grid"><input type="hidden" name="id" value="${p.id}"><div class="fg">${fld('Title','title',inp('title',p.title,'required'),'','full')}${fld('Version','version',inp('version',p.version,'required'))}${fld('Status','status',selx('status',['Approved','Draft','Retired'],p.status),'Only Approved documents are used for guidance.')}${fld('TAT (text)','tat',inp('tat',p.tat,'required'))}${fld('TAT working days','tatDays',inp('tatDays',p.tatDays,'type="number" min="0"'))}${fld('Required items, one per line: name | §ref | doc or action','docs',txa('docs',p.docs.map(d=>d.join(' | ')).join('\n'),'rows="5"'),'','full')}${fld('Source sections, one per line: §ref | text','sections',txa('sections',p.sections.map(s=>s.ref+' | '+s.text).join('\n'),'rows="5"'),'','full')}</div>${mf('Save document')}</form>`,{wide:true})},
+  'offer-edit'(el){const o=offer(el.dataset.id);openModal('Edit offer rule',`<form data-form="offer-edit" class="grid"><input type="hidden" name="id" value="${o.id}"><div class="fg">${fld('Offer','name',inp('name',o.name,'required'),'','full')}${fld('Rule ID','ruleId',inp('ruleId',o.ruleId,'required'))}${fld('Cooldown override (days, blank = default)','cd',inp('cd',o.cooldownDays==null?'':o.cooldownDays,'type="number" min="0"'))}${fld('Audience (from approved rule)','audience',txa('audience',o.audience,'rows="2"'),'','full')}${fld('Status','active',selx('active',[['1','Active'],['0','Paused']],o.active?'1':'0'))}</div>${mf('Save')}</form>`)},
+  'int-test'(el){toast(S.settings.integrations[+el.dataset.i][0]+': no credentials configured, so no connection was attempted.')},
+  'int-conf'(el){const x=S.settings.integrations[+el.dataset.i];openModal('Set up: '+esc(x[0]),`<p>${esc(x[1])}.</p><div class="banner"><div>Credentials are added by an admin in the secure server console and are never entered or stored in this page. Once configured, the server reports the real connection status here. Until then this integration runs on mock data.</div></div><div class="mfoot"><button class="btn pri" data-act="modal-close">Close</button></div>`)}
+};
+function outResult(r,d){
+  if(r.ok){closeModal();toast(`Claimed. Hold ends ${fmtT(r.claim.expiresAt)}. Log the outcome when you finish.`);renderAll();return}
+  const msg={hard:'Not allowed: the customer has opted out.',channel:'That channel is not allowed by the customer.',conflict:'Not claimed: someone else got there first, or a cooldown now applies. The screen has refreshed.',error:'Something went wrong. Try again.'}[r.code];
+  toast(msg);renderAll();if(r.code!=='error')outModal(d.c,d.o)}
+
+/* ============ form handlers ============ */
+const forms={
+  none(){},
+  'task-add'(d){mutate(s=>{const id=uid('t');s.tasks.push({id,title:d.title.trim(),ownerId:d.owner,due:fromL(d.due),status:'open',customerId:d.cust||null,linkedType:d.cust?'customer':'none',linkedId:d.cust||null,source:'manual',createdBy:ui.uid});audit('task',id,d.owner===ui.uid?'task.create':'task.assign',d.title+' → '+uname(d.owner))},'Task added.');closeModal()},
+  'task-resched'(d){mutate(s=>{const t=taskById(d.id),o=t.due;t.due=fromL(d.due);audit('task',t.id,'task.reschedule',`${fmtDT(o)} → ${fmtDT(t.due)}${d.reason?'. '+d.reason:''}`)},'Task rescheduled.');closeModal()},
+  'task-assign'(d){mutate(s=>{const t=taskById(d.id),id=uid('t');s.tasks.push({id,title:d.title.trim(),ownerId:d.owner,due:fromL(d.due),status:'open',customerId:t.customerId,linkedType:t.linkedType,linkedId:t.linkedId,source:'follow-up',createdBy:ui.uid,parentId:t.id});audit('task',id,'task.assign',`Follow-up to ${uname(d.owner)} (from ${t.id})`)},'Follow-up assigned to '+uname(d.owner)+'.');closeModal()},
+  visit(d){let v;const done=d.status==='Completed'&&d.remarks.trim();
+    mutate(s=>{v=d.id?s.visits.find(x=>x.id===d.id):null;const isNew=!v;if(isNew){v={id:uid('v'),ownerId:ui.uid,followUp:null};s.visits.push(v)}
+      Object.assign(v,{customerId:d.customerId,type:d.type,start:fromL(d.start),location:d.location.trim(),outcome:d.outcome,remarks:d.remarks.trim(),status:d.status});
+      if(d.fuAction&&d.fuAction.trim()){const due=d.fuDue?fromD(d.fuDue):at(1,17,30);
+        if(v.followUp&&v.followUp.taskId){const t=s.tasks.find(x=>x.id===v.followUp.taskId);if(t){t.title=d.fuAction;t.ownerId=d.fuOwner;t.due=due}}
+        else{const tid=uid('t');s.tasks.push({id:tid,title:d.fuAction.trim(),ownerId:d.fuOwner,due,status:'open',customerId:d.customerId,linkedType:'visit',linkedId:v.id,source:'visit',createdBy:ui.uid});v.followUp={taskId:tid}}
+        v.followUp=Object.assign(v.followUp,{action:d.fuAction.trim(),ownerId:d.fuOwner,due})}
+      audit('visit',v.id,isNew?'visit.create':'visit.update',`${v.type} · ${cust(v.customerId).name} · ${v.status}${v.outcome?' · '+v.outcome:''}`)},'Visit saved.');
+    closeModal();if(done)promptDraft(v.id)},
+  'issue-new'(d){mutate(s=>{const id='i'+uid('').slice(1);s.issues.push({id,customerId:d.customerId,type:d.type,desc:d.desc.trim(),priority:d.priority,ownerId:d.owner,status:'Open',next:d.next,nextDue:fromL(d.nextDue),due:fromL(d.due),created:now(),history:[{at:now(),by:ui.uid,from:'',to:'Open',note:'Issue logged.'}],escalatedTo:null});audit('issue',id,'issue.create',`${d.type} for ${cust(d.customerId).name}, owner ${uname(d.owner)}, TAT ${fmtDT(fromL(d.due))}`)},'Issue created with TAT '+fmtDT(fromL(d.due))+'.');closeModal()},
+  'issue-update'(d){const i=S.issues.find(x=>x.id===d.id),statusChg=d.status!==i.status,ownChg=d.owner!==i.ownerId;
+    if((statusChg||ownChg)&&!d.note.trim()){toast('Add a follow-up note to explain the change.');return}
+    mutate(s=>{const x=s.issues.find(q=>q.id===d.id),old=x.status;x.status=d.status;x.next=d.next;x.nextDue=d.nextDue?fromL(d.nextDue):null;
+      if(ownChg){audit('issue',x.id,'issue.assign',`${uname(x.ownerId)} → ${uname(d.owner)}`);x.ownerId=d.owner}
+      if(statusChg||d.note.trim()){x.history.push({at:now(),by:ui.uid,from:old,to:d.status,note:(ownChg?`Reassigned to ${uname(d.owner)}. `:'')+d.note.trim()});audit('issue',x.id,'issue.status',`${old} → ${d.status}. ${d.note.trim()}`)}},'Issue updated.');closeModal();issueModal(d.id)},
+  'issue-escalate'(d){mutate(s=>{const x=s.issues.find(q=>q.id===d.id);x.escalatedTo=d.to;x.history.push({at:now(),by:ui.uid,from:x.status,to:x.status,note:'Escalated to '+uname(d.to)+': '+d.reason});audit('issue',x.id,'issue.escalate','To '+uname(d.to)+': '+d.reason)},'Escalated to '+uname(d.to)+'.');closeModal();issueModal(d.id)},
+  'pw-new'(d){const pr=proc(d.processId);mutate(s=>{const id=uid('pw');s.paperwork.push({id,customerId:d.customerId,processId:d.processId,ownerId:d.owner,due:fromD(d.due),created:now(),items:pr.docs.map((x,k)=>({id:uid('pi'),docName:x[0],ref:x[1],type:x[2],status:'Pending',ownerId:d.owner,next:x[2]==='doc'?'Request from customer':'Complete when documents are in',reminderId:null}))});audit('paperwork',id,'paperwork.create',`${pr.title} v${pr.version} for ${cust(d.customerId).name}, due ${fmtD(fromD(d.due))}`)},'Checklist created from '+pr.title+' v'+pr.version+'.');closeModal()},
+  rem(d){mutate(s=>{const id=uid('r');s.reminders.push({id,title:d.title.trim(),ownerId:d.ownerId,at:fromL(d.at),recur:d.recur,channel:d.channel,linkedType:d.linkedType,linkedId:d.linkedId||null,status:'active',escalatedTo:null});
+      if(d.item){const[cid,iid]=d.item.split('|');const it=s.paperwork.find(p=>p.id===cid).items.find(x=>x.id===iid);it.reminderId=id}
+      audit('reminder',id,'reminder.create',`${d.title} · ${fmtDT(fromL(d.at))}${d.recur!=='none'?' · repeats '+d.recur:''}`)},'Reminder set for '+fmtDT(fromL(d.at))+'.');closeModal()},
+  'rem-snooze'(d){mutate(s=>{const r=s.reminders.find(x=>x.id===d.id);r.at=fromL(d.at);r.escalatedTo=null;audit('reminder',r.id,'reminder.reschedule',r.title+' → '+fmtDT(r.at))},'Reminder rescheduled.');closeModal()},
+  reassign(d){mutate(s=>{const rec=d.type==='task'?s.tasks.find(t=>t.id===d.id):s.issues.find(i=>i.id===d.id),old=rec.ownerId;rec.ownerId=d.owner;if(d.type==='issue')rec.history.push({at:now(),by:ui.uid,from:rec.status,to:rec.status,note:`Reassigned from ${uname(old)} to ${uname(d.owner)}: ${d.reason}`});audit(d.type,d.id,d.type+'.assign',`${uname(old)} → ${uname(d.owner)}: ${d.reason}`)},'Reassigned to '+uname(d.owner)+'.');closeModal()},
+  interaction(d){mutate(s=>{const id=uid('x');s.interactions.unshift({id,customerId:d.customerId,date:fromL(d.date),channel:d.channel,topic:d.topic.trim(),outcome:d.outcome,notes:d.notes.trim(),ownerId:ui.uid,kind:'service',nextAction:d.nextAction,source:'manual'});audit('interaction',id,'interaction.create',`${d.channel} · ${d.topic} · ${cust(d.customerId).name}`)},'Interaction saved to the customer record.');closeModal()},
+  'meeting-draft'(d,f){
+    const st=ui.filters.src||'Typed notes';if(st==='Pasted transcript'&&!d.consent){toast('Confirm that all participants were told and agreed before using a transcript.');return}
+    const text=(d.note||'').trim();if(text.length<20){toast('Add a little more detail so the draft has something to work from.');return}
+    const draft={id:uid('d'),kind:'meeting',sourceType:st==='Pasted transcript'?'Approved transcript':'Typed notes',sourceId:'',sourceText:text,createdBy:ui.uid,createdAt:now(),data:aiMeeting(text,d.title)};
+    mutate(s=>{s.drafts.push(draft);audit('draft',draft.id,'draft.created',`AI meeting draft from ${draft.sourceType}${st==='Pasted transcript'?' (consent confirmed, retention '+s.settings.transcriptRetentionDays+' days)':''}. Not saved until confirmed.`)});
+    ui.draftId=draft.id;renderAll();toast('AI draft ready. Review it before saving.')},
+  'int-pick'(d){const[k,id]=d.extra.split(':');const m=S.meetings.find(x=>x.id===id);closeModal();makeIntDraft(d.customerId,m.sourceText,'Meeting note',m.id,m.date)},
+  'int-free'(d){closeModal();makeIntDraft(d.customerId,d.text,'Banker notes','',now())},
+  'int-confirm'(d){const dr=S.drafts.find(x=>x.id===d.id);const o=dr.data,edited=['customerId','channel','topic','outcome','notes','nextAction'].filter(k=>String(o[k]||'')!==String(d[k]||'')||0);
+    mutate(s=>{const id=uid('x');s.interactions.unshift({id,customerId:d.customerId,date:fromL(d.date),channel:d.channel,topic:d.topic.trim(),outcome:d.outcome,notes:d.notes.trim(),ownerId:ui.uid,kind:'general',nextAction:d.nextAction,source:'ai-draft',draftId:dr.id});
+      s.drafts=s.drafts.filter(x=>x.id!==dr.id);audit('interaction',id,'interaction.create',`Saved from AI draft ${dr.id} (${dr.sourceType}) after banker review. Edited fields: ${edited.join(', ')||'none'}.`)},'Confirmed and saved to the customer record.');closeModal();
+    if(ui.route==='customer'&&ui.param!==d.customerId)go('customer-'+d.customerId)},
+  'out-log'(d){if((d.outcome==='Awaiting callback'||d.outcome==='Interested – follow-up agreed')&&!d.next){toast('Add the next follow-up date.');return}
+    Out.log(d.c,d.o,{channel:d.channel,outcome:d.outcome,notes:d.notes.trim(),next:d.next?fromD(d.next):null});closeModal();renderAll();toast('Outcome saved. Team status updated.')},
+  'proc-edit'(d){const docs=d.docs.split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a[0]).map(a=>[a[0],a[1]||'',a[2]==='action'?'action':'doc']),secs=d.sections.split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a[0]).map(a=>({ref:a[0],text:a.slice(1).join(' | ')}));
+    mutate(s=>{let p=d.id?s.processes.find(x=>x.id===d.id):null;if(!p){p={id:'p'+uid('').slice(1),approvedOn:null,owner:'Added by admin (fictional)'};s.processes.push(p)}
+      Object.assign(p,{title:d.title,version:d.version,status:d.status,tat:d.tat,tatDays:+d.tatDays||0,docs,sections:secs});if(d.status==='Approved'&&!p.approvedOn)p.approvedOn=now();audit('process',p.id,'process.update',`${p.title} v${p.version} · ${p.status}`)},'Process document saved.');closeModal()},
+  'offer-edit'(d){mutate(s=>{const o=s.offers.find(x=>x.id===d.id);Object.assign(o,{name:d.name,ruleId:d.ruleId,audience:d.audience,cooldownDays:d.cd===''?null:+d.cd,active:d.active==='1'});audit('offer',o.id,'offer.rule',`${o.name}: cooldown ${o.cooldownDays==null?'default':o.cooldownDays+'d'}, ${o.active?'active':'paused'}`)},'Offer rule saved.');closeModal()},
+  'user-add'(d){mutate(s=>{const id='u'+uid('').slice(1);s.users.push({id,name:d.name.trim(),role:d.role,branch:d.branch.trim(),active:true});audit('user',id,'user.create',`${d.name} as ${d.role}`)},'User added.');closeModal();renderShell()},
+  'set-cooldown'(d){mutate(s=>{Object.assign(s.settings,{cooldownDays:+d.cd,declineCooldownDays:+d.dd,claimMinutes:+d.cm});audit('settings','cooldown','settings.update',`Cooldown ${d.cd}d, declined ${d.dd}d, claim hold ${d.cm} min`)},'Outreach rules saved.')},
+  'set-rem'(d){const it=d.it.split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a[0]&&+a[1]>0).map(a=>[a[0],+a[1]]);if(!it.length){toast('Add at least one issue type with hours, e.g. Card dispute | 120.');return}
+    mutate(s=>{Object.assign(s.settings,{escalationHours:+d.eh,defaultReminderChannel:s.settings.channelsConnected[d.dc]?d.dc:'In-app',issueTypes:it});audit('settings','reminders','settings.update',`Escalation ${d.eh}h, ${it.length} issue types`)},'Reminder settings saved.')},
+  'set-priv'(d){mutate(s=>{Object.assign(s.settings,{audioCapture:!!d.audio,transcriptRetentionDays:+d.tr});audit('settings','privacy','settings.update',`Audio capture ${d.audio?'allowed':'off'}, retention ${d.tr}d`)},'Privacy settings saved.')},
+  assist(d,f){const q=(d.q||'').trim();if(!q)return;ask(q)}
+};
+
+/* ============ events ============ */
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.search')){const r=$('#sres');if(r)r.hidden=true}
+  if(!e.target.closest('.tools')){const p=$('#bellpop');if(p)p.hidden=true}
+  if(e.target.closest('.side a'))document.body.classList.remove('nav-open');
+  const el=e.target.closest('[data-act]');if(!el)return;const a=acts[el.dataset.act];if(a)a(el,e);
+});
+document.addEventListener('submit',e=>{const f=e.target.closest('form[data-form]');if(!f)return;e.preventDefault();const h=forms[f.dataset.form];if(h)h(Object.fromEntries(new FormData(f)),f)});
+document.addEventListener('input',e=>{
+  const el=e.target.closest('[data-filter]');
+  if(el){if(el.dataset.filter==='src'){const n=$('#f-note');if(n)ui.filters.note=n.value}ui.filters[el.dataset.filter]=el.value;renderAll();return}
+  if(e.target.id==='gsearch'){const q=e.target.value.trim().toLowerCase(),r=$('#sres');if(!q){r.hidden=true;return}
+    const m=S.customers.filter(c=>(c.name+' '+c.ref).toLowerCase().includes(q)).slice(0,6);
+    r.innerHTML=m.length?m.map(c=>`<a href="#customer-${c.id}" data-close-search><b>${esc(c.name)}</b><div class="small muted">${esc(c.ref)} · ${esc(c.segment)} · ${esc(c.branch)}</div></a>`).join(''):'<div class="none">No customers match. Try a name or reference.</div>';r.hidden=false}
+});
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.id==='userSel'){ui.uid=el.value;try{sessionStorage.setItem(SS,ui.uid)}catch(x){}closeModal();ui.assistOpen=false;renderDrawer();ui.chat=[];ui.draftId=null;ui.filters={};renderShell();if(!canOpen(ui.route)&&ui.route!=='customer'){}renderAll();toast('Now viewing as '+cur().name+' ('+RLABEL[cur().role]+').');return}
+  const c=el.dataset&&el.dataset.chg;if(!c)return;
+  if(c==='issue-type'){const h=(S.settings.issueTypes.find(x=>x[0]===el.value)||[0,72])[1];$('#f-due').value=lin(now()+h*HR)}
+  if(c==='rem-type'){$('#f-linkedId').innerHTML=remTargets(el.value)}
+  if(c==='user-role'){mutate(s=>{const u=user(el.dataset.id),o=u.role;u.role=el.value;audit('user',u.id,'user.role',`${u.name}: ${o} → ${u.role}`)},'Role updated.');renderShell()}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if($('#layer').innerHTML)closeModal();else if(ui.assistOpen){ui.assistOpen=false;renderDrawer()}$('#bellpop')&&($('#bellpop').hidden=true);$('#sres')&&($('#sres').hidden=true)}
+  if(e.key==='Enter'&&e.target.id==='gsearch'){const a=$('#sres a');if(a){location.hash=a.getAttribute('href').slice(1);$('#sres').hidden=true;e.target.value=''}}
+});
+window.addEventListener('hashchange',()=>{parseHash();if(!canOpen(ui.route)&&ui.route!=='customer'){}renderAll();runAfter();window.scrollTo(0,0)});
+window.addEventListener('storage',e=>{if(e.key===LS&&S){const s=Server.load();if(s&&s.version>S.version){S=s;renderAll();renderDrawer();toast('Shared status updated by a teammate.')}}});
+setInterval(()=>{if(S&&!ui.loading&&!$('#layer').innerHTML&&!document.activeElement.closest('#view input,#view textarea,#view select'))renderAll()},60000);
+
+/* ============ boot ============ */
+(function boot(){
+  const dl=document.createElement('div');dl.id='dlayer';document.body.appendChild(dl);
+  try{loadState()}catch(e){ui.error=String(e&&e.message||e)}
+  if(S)renderShell();else $('#top').innerHTML='<h1 id="ptitle">Banker workspace</h1>';
+  parseHash();renderAll();
+  setTimeout(()=>{ui.loading=false;renderAll();runAfter()},450);
+})();
+</script>
+
+</body></html>
