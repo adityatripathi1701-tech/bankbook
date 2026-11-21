@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniBanker Workspace - Internal Branch System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="h-full overflow-hidden text-slate-800 bg-slate-50 flex flex-col">
+
+  <!-- Top Global Navigation Bar -->
+  <header class="bg-indigo-900 text-white h-14 px-4 flex items-center justify-between shrink-0 shadow-md z-30">
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-2">
+        <div class="bg-indigo-600 p-1.5 rounded-lg flex items-center justify-center font-bold shadow-inner">
+          <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+        </div>
+        <span class="font-bold text-lg tracking-tight">OmniBanker <span class="text-indigo-300 font-normal text-sm px-1.5 py-0.5 bg-indigo-800 rounded">Branch Workspace</span></span>
+      </div>
+      <div class="hidden md:flex items-center bg-indigo-950/60 rounded-lg px-3 py-1.5 w-72 border border-indigo-700/50">
+        <i data-lucide="search" class="w-4 h-4 text-indigo-300 mr-2"></i>
+        <input type="text" id="globalSearchInput" placeholder="Search customer, ID, or task..." class="bg-transparent text-xs text-white placeholder-indigo-300 focus:outline-none w-full" oninput="handleGlobalSearch(this.value)">
+      </div>
+    </div>
+    
+    <div class="flex items-center space-x-3">
+      <!-- Role Switcher for Demo -->
+      <div class="flex items-center bg-indigo-950 rounded-lg p-1 border border-indigo-700/60 text-xs">
+        <span class="px-2 text-indigo-300 font-medium hidden sm:inline">Role:</span>
+        <button onclick="switchRole('banker')" id="roleBtnBanker" class="px-2.5 py-1 rounded transition-colors font-medium bg-indigo-600 text-white shadow">Banker</button>
+        <button onclick="switchRole('manager')" id="roleBtnManager" class="px-2.5 py-1 rounded transition-colors font-medium text-indigo-300 hover:text-white">Manager</button>
+        <button onclick="switchRole('admin')" id="roleBtnAdmin" class="px-2.5 py-1 rounded transition-colors font-medium text-indigo-300 hover:text-white">Admin</button>
+      </div>
+
+      <!-- Notifications -->
+      <div class="relative">
+        <button onclick="toggleNotifications()" class="p-2 rounded-lg hover:bg-indigo-800 transition-colors relative">
+          <i data-lucide="bell" class="w-5 h-5 text-indigo-200"></i>
+          <span id="notifBadge" class="absolute top-1 right-1 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">3</span>
+        </button>
+        <!-- Notification Dropdown -->
+        <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-200 py-2 z-50 text-slate-800">
+          <div class="px-4 py-2 border-b border-slate-100 flex justify-between items-center">
+            <span class="font-semibold text-xs text-slate-700">Notifications & Escalations</span>
+            <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">3 New</span>
+          </div>
+          <div class="max-h-64 overflow-y-auto custom-scrollbar divide-y divide-slate-100" id="notifList">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- User Profile Badge -->
+      <div class="flex items-center space-x-2 pl-2 border-l border-indigo-800">
+        <div class="w-8 h-8 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center text-xs shadow" id="userAvatar">AR</div>
+        <div class="hidden lg:block text-left">
+          <div class="text-xs font-semibold" id="userNameLabel">Aarav Sharma</div>
+          <div class="text-[10px] text-indigo-300" id="userRoleLabel">Personal Banker (ID: PB-4029)</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Body Layout -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Left Sidebar -->
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 select-none z-20">
+      <div class="p-3 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+        <span class="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Branch: Downtown Main (#104)</span>
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700">
+          <span class="w-1.5 h-1.5 mr-1 bg-emerald-500 rounded-full animate-pulse"></span> Live
+        </span>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1" id="sidebarNav">
+        <!-- Rendered via JS -->
+      </nav>
+
+      <!-- AI Assistant Quick Trigger Card -->
+      <div class="p-3 m-3 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100 shadow-sm">
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center space-x-1.5">
+            <i data-lucide="sparkles" class="w-4 h-4 text-indigo-600"></i>
+            <span class="text-xs font-semibold text-indigo-900">AI Branch Copilot</span>
+          </div>
+          <span class="text-[9px] bg-indigo-200/60 text-indigo-800 px-1.5 py-0.5 rounded font-mono">v2.4</span>
+        </div>
+        <p class="text-[11px] text-slate-600 mb-2">Ready to summarize notes, draft tasks, or suggest next outreach.</p>
+        <button onclick="openAiAssistantModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium py-1.5 px-3 rounded-lg shadow transition-colors flex items-center justify-center space-x-1.5">
+          <i data-lucide="message-square-code" class="w-3.5 h-3.5"></i>
+          <span>Open Copilot Assistant</span>
+        </button>
+      </div>
+
+      <div class="p-3 border-t border-slate-100 text-[11px] text-slate-400 flex items-center justify-between">
+        <span>Demo Environment</span>
+        <span class="font-mono text-slate-500">v4.1.0</span>
+      </div>
+    </aside>
+
+    <!-- Main Content Viewport -->
+    <main class="flex-1 overflow-y-auto custom-scrollbar bg-slate-50 flex flex-col relative" id="mainViewport">
+      <!-- Dynamic Page Content injected here -->
+    </main>
+
+  </div>
+
+  <!-- Global Modals Container -->
+  <div id="modalContainer"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- Application Logic & Seed Data Script -->
+  <script>
+    // --- STATE MANAGEMENT ---
+    let currentUser = {
+      role: 'banker', // 'banker', 'manager', 'admin'
+      name: 'Aarav Sharma',
+      id: 'PB-4029',
+      branch: 'Downtown Main (#104)'
+    };
+
+    let activeTab = 'my_day';
+
+    // Mock Database Stores
+    const db = {
+      tasks: [
+        { id: 'TSK-101', title: 'Review mortgage sanction paperwork for Vikram Patel', customer: 'Vikram Patel', type: 'Paperwork', due: '2026-03-20', status: 'Pending', priority: 'High', assignedTo: 'Aarav Sharma' },
+        { id: 'TSK-102', title: 'Call Ananya Desai regarding Wealth Management review', customer: 'Ananya Desai', type: 'Outreach', due: 'Today', status: 'Pending', priority: 'Medium', assignedTo: 'Aarav Sharma' },
+        { id: 'TSK-103', title: 'Resolve KYC address mismatch issue for Rajesh Kumar', customer: 'Rajesh Kumar', type: 'Issue', due: 'Today', status: 'In Progress', priority: 'Urgent', assignedTo: 'Aarav Sharma' },
+        { id: 'TSK-104', title: 'Follow up on business loan collateral valuation', customer: 'Meera Nair', type: 'Visit', due: '2026-03-22', status: 'Completed', priority: 'Medium', assignedTo: 'Aarav Sharma' },
+        { id: 'TSK-105', title: 'Verify tax returns for SME credit line renewal', customer: 'Suresh Menon', type: 'Paperwork', due: 'Today', status: 'Pending', priority: 'High', assignedTo: 'Aarav Sharma' }
+      ],
+      targets: {
+        meetingsCompleted: { current: 14, target: 20 },
+        paperworkProcessed: { current: 32, target: 40 },
+        outreachCalls: { current: 18, target: 25 },
+        customerSatisfaction: { current: '4.8/5.0', target: '4.5+' }
+      },
+      visits: [
+        { id: 'VST-501', customer: 'Vikram Patel', type: 'Scheduled Branch Visit', date: '2026-03-18 10:30 AM', location: 'Downtown Branch Cabin 3', outcome: 'Discussed home loan top-up. Customer requested lower processing fee waiver.', remarks: 'Very receptive. Sent fee waiver approval request to branch head.', nextAction: 'Send sanction letter draft by tomorrow', owner: 'Aarav Sharma', status: 'Completed' },
+        { id: 'VST-502', customer: 'Meera Nair (Nair Enterprises)', type: 'Client Site Visit', date: '2026-03-19 02:00 PM', location: 'Industrial Area Phase 2', outcome: 'Inspected warehouse inventory as collateral for working capital.', remarks: 'Stock levels robust. Business expanding to 2 new units.', nextAction: 'Collect Q3 audited balance sheet', owner: 'Aarav Sharma', status: 'Planned' },
+        { id: 'VST-503', customer: 'Rohan Mehta', type: 'Cold Walk-in Inquiry', date: '2026-03-16 11:15 AM', location: 'Downtown Branch Lobby', outcome: 'Inquired about NRI repatriation account.', remarks: 'Provided brochure and fee schedule.', nextAction: 'Email digital application link', owner: 'Aarav Sharma', status: 'Completed' }
+      ],
+      issues: [
+        { id: 'ISS-901', customer: 'Rajesh Kumar', type: 'KYC Address Discrepancy', description: 'Utility bill submitted does not match Aadhaar address pin code.', priority: 'Urgent', owner: 'Aarav Sharma', status: 'In Progress', tat: '24 Hours', timeRemaining: '4 Hours', deadline: '2026-03-16 05:00 PM', history: [{ time: '2026-03-15 10:00 AM', note: 'Issue logged upon document verification failure.' }, { time: '2026-03-16 09:30 AM', note: 'Contacted customer for secondary address proof.' }] },
+        { id: 'ISS-902', customer: 'Sunita Rao', type: 'Failed NEFT Transfer', description: 'Outward remittance of ₹2,50,000 held up due to beneficiary IFSC mismatch.', priority: 'High', owner: 'Priya Sen', status: 'Waiting on Team', tat: '12 Hours', timeRemaining: '1 Hour', deadline: '2026-03-16 02:00 PM', history: [{ time: '2026-03-16 08:00 AM', note: 'Escalated to Central Clearing Ops.' }] },
+        { id: 'ISS-903', customer: 'Amitabh Roy', type: 'Credit Card Limit Enhancement Delay', description: 'Pre-approved limit hike pending activation in mobile app.', priority: 'Medium', owner: 'Aarav Sharma', status: 'Resolved', tat: '48 Hours', timeRemaining: 'Completed', deadline: '2026-03-15 06:00 PM', history: [{ time: '2026-03-14 02:00 PM', note: 'Request submitted.' }, { time: '2026-03-15 11:00 AM', note: 'Activated successfully.' }] }
+      ],
+      paperwork: [
+        { id: 'DOC-301', customer: 'Vikram Patel', process: 'Home Loan Sanction #HL-8821', requiredDoc: 'Registered Sale Deed & Property Tax Receipt', status: 'Verified', owner: 'Aarav Sharma', dueDate: '2026-03-22', tat: '3 Days', source: 'Approved Mortgage Guidelines v4.2 (Sec 3.1)', nextStep: 'Dispatch for legal opinion sign-off' },
+        { id: 'DOC-302', customer: 'Suresh Menon', process: 'SME Overdraft Renewal #OD-409', requiredDoc: 'Audited Profit & Loss Statement (FY 2025)', status: 'Pending', owner: 'Aarav Sharma', dueDate: '2026-03-18', tat: '1 Day', source: 'Commercial Lending Manual 2026', nextStep: 'Customer reminder sent via SMS/Email' },
+        { id: 'DOC-303', customer: 'Pooja Hegde', process: 'Current Account Upgrade', requiredDoc: 'Board Resolution & GST Certificate', status: 'Submitted', owner: 'Rohit Verma', dueDate: '2026-03-19', tat: '2 Days', source: 'Corporate KYC Standard SOP', nextStep: 'Branch Manager final approval' }
+      ],
+      outreach: [
+        { id: 'OUT-701', customer: 'Ananya Desai', offer: 'Pre-approved Wealth Management Portfolio (Yield+)', status: 'Unclaimed', owner: null, lastContact: 'Never', channel: '-', cooldownUntil: null, notes: 'Eligible based on average quarterly balance > ₹50L.' },
+        { id: 'OUT-702', customer: 'Vikram Patel', offer: 'Home Loan Top-Up (Low Interest Festive Promo)', status: 'Claimed', owner: 'Aarav Sharma', lastContact: '2026-03-18', channel: 'In-Person Visit', cooldownUntil: '2026-03-25', notes: 'Discussed during branch visit. Interested in ₹15L top-up for renovation.' },
+        { id: 'OUT-703', customer: 'Karan Johar', offer: 'Forex Travel Card & Multi-Currency Wallet', status: 'Contacted', owner: 'Priya Sen', lastContact: '2026-03-15', channel: 'Phone Call', cooldownUntil: '2026-03-30', notes: 'Customer traveling in April. Sent rate sheet via email.' },
+        { id: 'OUT-704', customer: 'Neha Sharma', offer: 'SME Business Growth Credit Line', status: 'Declined', owner: 'Aarav Sharma', lastContact: '2026-03-10', channel: 'Phone Call', cooldownUntil: '2026-04-10', notes: 'Not interested at current interest rates.' }
+      ],
+      reminders: [
+        { id: 'REM-11', title: 'Call Vikram Patel regarding top-up sanction', date: 'Today, 03:00 PM', type: 'Task', owner: 'Aarav Sharma', status: 'Active' },
+        { id: 'REM-12', title: 'Submit audit compliance checklist to branch manager', date: '2026-03-18, 10:00 AM', type: 'Paperwork', owner: 'Aarav Sharma', status: 'Active' },
+        { id: 'REM-13', title: 'Site visit with Meera Nair (Industrial Area)', date: '2026-03-19, 02:00 PM', type: 'Visit', owner: 'Aarav Sharma', status: 'Active' }
+      ],
+      auditLog: [
+        { id: 'AUD-991', timestamp: '2026-03-16 09:15 AM', user: 'Aarav Sharma (PB-4029)', action: 'Claimed Outreach', details: 'Claimed outreach for Vikram Patel (Home Loan Top-Up).' },
+        { id: 'AUD-990', timestamp: '2026-03-15 04:30 PM', user: 'Priya Sen (MGR-102)', action: 'Escalation Override', details: 'Extended TAT for Issue ISS-902 due to technical clearing outage.' },
+        { id: 'AUD-989', timestamp: '2026-03-15 02:10 PM', user: 'Aarav Sharma (PB-4029)', action: 'Created Visit Record', details: 'Recorded visit VST-501 with Vikram Patel.' }
+      ],
+      teamWorkload: [
+        { name: 'Aarav Sharma', role: 'Personal Banker', activeTasks: 5, pendingVisits: 2, outreachDone: 18, rating: '4.9/5' },
+        { name: 'Priya Sen', role: 'Senior Banker', activeTasks: 3, pendingVisits: 1, outreachDone: 24, rating: '4.8/5' },
+        { name: 'Rohit Verma', role: 'Personal Banker', activeTasks: 7, pendingVisits: 3, outreachDone: 14, rating: '4.6/5' },
+        { name: 'Sneha Kapoor', role: 'Wealth Specialist', activeTasks: 4, pendingVisits: 2, outreachDone: 21, rating: '4.9/5' }
+      ],
+      adminSettings: {
+        cooldownDays: 14,
+        autoAssignLeads: true,
+        strictTatAlerts: true,
+        aiTranscriptionEnabled: true,
+        approvedProcessVersion: 'v4.2-MAR2026'
+      }
+    };
+
+    // Navigation configuration
+    const navItems = [
+      { id: 'my_day', label: 'My Day', icon: 'sun', roles: ['banker', 'manager', 'admin'] },
+      { id: 'meeting_notes', label: 'Meeting Notes & AI', icon: 'mic', roles: ['banker', 'manager', 'admin'] },
+      { id: 'visits', label: 'Visits', icon: 'map-pin', roles: ['banker', 'manager', 'admin'] },
+      { id: 'customer_issues', label: 'Customer Issues', icon: 'alert-circle', roles: ['banker', 'manager', 'admin'] },
+      { id: 'paperwork', label: 'Paperwork & Processes', icon: 'file-text', roles: ['banker', 'manager', 'admin'] },
+      { id: 'customer_outreach', label: 'Customer Outreach', icon: 'users', roles: ['banker', 'manager', 'admin'] },
+      { id: 'reminders', label: 'Reminders', icon: 'bell', roles: ['banker', 'manager', 'admin'] },
+      { id: 'team_overview', label: 'Team Overview', icon: 'bar-chart-2', roles: ['manager', 'admin'] },
+      { id: 'settings', label: 'Settings & Admin', icon: 'settings', roles: ['admin'] }
+    ];
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+      renderSidebar();
+      renderActivePage();
+      updateNotificationBadge();
+      lucide.createIcons();
+    });
+
+    function switchRole(role) {
+      currentUser.role = role;
+      if (role === 'banker') {
+        currentUser.name = 'Aarav Sharma';
+        currentUser.id = 'PB-4029';
+        document.getElementById('userRoleLabel').innerText = 'Personal Banker (ID: PB-4029)';
+        document.getElementById('userNameLabel').innerText = 'Aarav Sharma';
+        document.getElementById('userAvatar').innerText = 'AS';
+      } else if (role === 'manager') {
+        currentUser.name = 'Priya Sen';
+        currentUser.id = 'MGR-102';
+        document.getElementById('userRoleLabel').innerText = 'Branch Manager (ID: MGR-102)';
+        document.getElementById('userNameLabel').innerText = 'Priya Sen';
+        document.getElementById('userAvatar').innerText = 'PS';
+      } else if (role === 'admin') {
+        currentUser.name = 'Vikram Malhotra';
+        currentUser.id = 'ADM-001';
+        document.getElementById('userRoleLabel').innerText = 'System Admin (ID: ADM-001)';
+        document.getElementById('userNameLabel').innerText = 'Vikram Malhotra';
+        document.getElementById('userAvatar').innerText = 'VM';
+      }
+
+      // Update button styles
+      ['banker', 'manager', 'admin'].forEach(r => {
+        const btn = document.getElementById(`roleBtn${r.charAt(0).toUpperCase() + r.slice(1)}`);
+        if (r === role) {
+          btn.className = 'px-2.5 py-1 rounded transition-colors font-medium bg-indigo-600 text-white shadow';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded transition-colors font-medium text-indigo-300 hover:text-white';
+        }
+      });
+
+      // If manager/admin specific tab is active and user switches to banker, redirect to my_day
+      const currentNavItem = navItems.find(n => n.id === activeTab);
+      if (currentNavItem && !currentNavItem.roles.includes(role)) {
+        activeTab = 'my_day';
+      }
+
+      renderSidebar();
+      renderActivePage();
+      showToast(`Switched role to ${currentUser.name} (${role.toUpperCase()})`, 'info');
+    }
+
+    function renderSidebar() {
+      const navContainer = document.getElementById('sidebarNav');
+      navContainer.innerHTML = '';
+
+      navItems.forEach(item => {
+        if (!item.roles.includes(currentUser.role)) return;
+
+        const isActive = activeTab === item.id;
+        const btn = document.createElement('button');
+        btn.onclick = () => {
+          activeTab = item.id;
+          renderSidebar();
+          renderActivePage();
+        };
+        btn.className = `w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
+          isActive 
+            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' 
+            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+        }`;
+        
+        btn.innerHTML = `
+          <i data-lucide="${item.icon}" class="w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}"></i>
+          <span>${item.label}</span>
+        `;
+        navContainer.appendChild(btn);
+      });
+      lucide.createIcons();
+    }
+
+    function renderActivePage() {
+      const viewport = document.getElementById('mainViewport');
+      viewport.innerHTML = '';
+
+      switch(activeTab) {
+        case 'my_day': renderMyDayPage(viewport); break;
+        case 'meeting_notes': renderMeetingNotesPage(viewport); break;
+        case 'visits': renderVisitsPage(viewport); break;
+        case 'customer_issues': renderIssuesPage(viewport); break;
+        case 'paperwork': renderPaperworkPage(viewport); break;
+        case 'customer_outreach': renderOutreachPage(viewport); break;
+        case 'reminders': renderRemindersPage(viewport); break;
+        case 'team_overview': renderTeamOverviewPage(viewport); break;
+        case 'settings': renderSettingsPage(viewport); break;
+        default: viewport.innerHTML = `<div class="p-8">Page not found</div>`;
+      }
+      lucide.createIcons();
+    }
+
+    // --- PAGE 1: MY DAY DASHBOARD ---
+    function renderMyDayPage(container) {
+      const pendingTasks = db.tasks.filter(t => t.assignedTo === currentUser.name || currentUser.role === 'manager');
+      const dueTodayCount = pendingTasks.filter(t => t.due === 'Today' && t.status !== 'Completed').length;
+      const overdueCount = pendingTasks.filter(t => t.due < '2026-03-16' && t.status !== 'Completed').length;
+
+      container.innerHTML = `
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+          <!-- Welcome & Summary Header -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">
+                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                <span>Monday, March 16, 2026 • Branch #104</span>
+              </div>
+              <h1 class="text-2xl font-bold text-slate-900">Good morning, ${currentUser.name}</h1>
+              <p class="text-xs text-slate-500 mt-0.5">You have <span class="font-semibold text-slate-700">${dueTodayCount} tasks due today</span> and <span class="font-semibold text-rose-600">${overdueCount} overdue items</span> requiring attention.</p>
+            </div>
+            <div class="flex items-center space-x-3">
+              <button onclick="openQuickInteractionModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition-all flex items-center space-x-2">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <span>Log Interaction</span>
+              </button>
+              <button onclick="openAiAssistantModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all flex items-center space-x-2 border border-slate-200">
+                <i data-lucide="sparkles" class="w-4 h-4 text-indigo-600"></i>
+                <span>Ask AI Copilot</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Target Progress Section (Factual status, not sales pressure) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+              <div class="flex justify-between items-start mb-3">
+                <span class="text-xs font-medium text-slate-500">Meetings Logged</span>
+                <span class="text-[10px] bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">Monthly Target</span>
+              </div>
+              <div class="text-2xl font-bold text-slate-900">${db.targets.meetingsCompleted.current} <span class="text-xs text-slate-400 font-normal">/ ${db.targets.meetingsCompleted.target}</span></div>
+              <div class="w-full bg-slate-100 rounded-full h-2 mt-3 overflow-hidden">
+                <div class="bg-indigo-600 h-2 rounded-full" style="width: ${(db.targets.meetingsCompleted.current / db.targets.meetingsCompleted.target)*100}%"></div>
+              </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+              <div class="flex justify-between items-start mb-3">
+                <span class="text-xs font-medium text-slate-500">Paperwork Processed</span>
+                <span class="text-[10px] bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-full">SLA Compliant</span>
+              </div>
+              <div class="text-2xl font-bold text-slate-900">${db.targets.paperworkProcessed.current} <span class="text-xs text-slate-400 font-normal">/ ${db.targets.paperworkProcessed.target}</span></div>
+              <div class="w-full bg-slate-100 rounded-full h-2 mt-3 overflow-hidden">
+                <div class="bg-emerald-500 h-2 rounded-full" style="width: ${(db.targets.paperworkProcessed.current / db.targets.paperworkProcessed.target)*100}%"></div>
+              </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+              <div class="flex justify-between items-start mb-3">
+                <span class="text-xs font-medium text-slate-500">Outreach Calls Made</span>
+                <span class="text-[10px] bg-amber-50 text-amber-700 font-semibold px-2 py-0.5 rounded-full">Target Pace</span>
+              </div>
+              <div class="text-2xl font-bold text-slate-900">${db.targets.outreachCalls.current} <span class="text-xs text-slate-400 font-normal">/ ${db.targets.outreachCalls.target}</span></div>
+              <div class="w-full bg-slate-100 rounded-full h-2 mt-3 overflow-hidden">
+                <div class="bg-amber-500 h-2 rounded-full" style="width: ${(db.targets.outreachCalls.current / db.targets.outreachCalls.target)*100}%"></div>
+              </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+              <div class="flex justify-between items-start mb-3">
+                <span class="text-xs font-medium text-slate-500">Customer CSAT Score</span>
+                <span class="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded-full">Quality Index</span>
+              </div>
+              <div class="text-2xl font-bold text-slate-900">${db.targets.customerSatisfaction.current}</div>
+              <p class="text-[11px] text-slate-500 mt-2 flex items-center">
+                <i data-lucide="trending-up" class="w-3 h-3 text-emerald-500 mr-1"></i> +0.2 vs branch average
+              </p>
+            </div>
+          </div>
+
+          <!-- Tasks & Daily Schedule Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left 2 Cols: Tasks List -->
+            <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+              <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <div class="flex items-center space-x-2">
+                  <i data-lucide="check-square" class="w-4 h-4 text-indigo-600"></i>
+                  <h2 class="font-bold text-slate-900 text-sm">Today's Assigned Action Items</h2>
+                </div>
+                <span class="text-xs bg-indigo-50 text-indigo-700 font-medium px-2.5 py-1 rounded-full">${pendingTasks.length} Total Items</span>
+              </div>
+              <div class="divide-y divide-slate-100 overflow-y-auto max-h-[420px] custom-scrollbar">
+                ${pendingTasks.length === 0 ? '<div class="p-8 text-center text-slate-400 text-xs">No pending tasks for today. Excellent work!</div>' : pendingTasks.map(t => `
+                  <div class="p-4 hover:bg-slate-50/80 transition-colors flex items-center justify-between gap-4">
+                    <div class="flex items-start space-x-3">
+                      <button onclick="toggleTaskStatus('${t.id}')" class="mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${t.status === 'Completed' ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 bg-white hover:border-indigo-500'}">
+                        ${t.status === 'Completed' ? '<i data-lucide="check" class="w-3.5 h-3.5"></i>' : ''}
+                      </button>
+                      <div>
+                        <div class="flex items-center space-x-2">
+                          <span class="text-xs font-semibold ${t.status === 'Completed' ? 'line-through text-slate-400' : 'text-slate-800'}">${t.title}</span>
+                          <span class="text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                            t.priority === 'Urgent' ? 'bg-rose-50 text-rose-700' :
+                            t.priority === 'High' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600'
+                          }">${t.priority}</span>
+                        </div>
+                        <div class="flex items-center space-x-3 text-[11px] text-slate-500 mt-1">
+                          <span>Customer: <strong class="text-slate-700">${t.customer}</strong></span>
+                          <span>•</span>
+                          <span>Due: <strong class="${t.due === 'Today' ? 'text-indigo-600 font-semibold' : 'text-slate-700'}">${t.due}</strong></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-2 shrink-0">
+                      <span class="text-[10px] px-2 py-1 rounded font-medium ${
+                        t.status === 'Completed' ? 'bg-emerald-50 text-emerald-700' :
+                        t.status === 'In Progress' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'
+                      }">${t.status}</span>
+                      <button onclick="openRescheduleModal('${t.id}')" class="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Reschedule or Edit">
+                        <i data-lucide="clock" class="w-4 h-4"></i>
+                      </button>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Right Col: Reminders & Urgent Notices -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col">
+              <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
+                <div class="flex items-center space-x-2">
+                  <i data-lucide="bell" class="w-4 h-4 text-indigo-600"></i>
+                  <h2 class="font-bold text-slate-900 text-sm">Active Reminders</h2>
+                </div>
+                <button onclick="openNewReminderModal()" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold flex items-center space-x-1">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                  <span>Add</span>
+                </button>
+              </div>
+              <div class="space-y-3 overflow-y-auto max-h-[380px] custom-scrollbar">
+                ${db.reminders.map(r => `
+                  <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex items-start justify-between">
+                    <div class="space-y-1">
+                      <div class="text-xs font-semibold text-slate-800">${r.title}</div>
+                      <div class="text-[10px] text-slate-500 flex items-center space-x-2">
+                        <span class="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-medium">${r.type}</span>
+                        <span>${r.date}</span>
+                      </div>
+                    </div>
+                    <button onclick="completeReminder('${r.id}')" class="text-slate-400 hover:text-emerald-600 p-1" title="Mark Done">
+                      <i data-lucide="check-circle" class="w-4 h-4"></i>
+                    </button>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- PAGE 2: AI MEETING NOTES & DAILY PLAN ---
+    function renderMeetingNotesPage(container) {
+      container.innerHTML = `
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">
+                <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+                <span>AI Copilot Meeting Assistant</span>
+              </div>
+              <h1 class="text-2xl font-bold text-slate-900">Meeting Notes & Transcript Processing</h1>
+              <p class="text-xs text-slate-500 mt-0.5">Paste raw meeting notes or upload an approved transcript. AI will structure action items, decisions, and follow-ups for your review.</p>
+            </div>
+            <div class="px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-xs flex items-center space-x-2">
+              <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 shrink-0"></i>
+              <span>Requires Banker review & confirmation before saving.</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left: Raw Input Form -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col space-y-4">
+              <h2 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+                <i data-lucide="file-edit" class="w-4 h-4 text-indigo-600"></i>
+                <span>Raw Notes / Transcript Input</span>
+              </h2>
+              
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Customer / Meeting Title</label>
+                <input type="text" id="meetingTitleInput" value="Vikram Patel - Home Loan Top-Up & Wealth Discussion" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Raw Discussion Notes / Transcript Text</label>
+                <textarea id="rawNotesInput" rows="7" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 custom-scrollbar" placeholder="Paste transcript or notes here...">Met Vikram Patel at branch cabin 3 today. He discussed needing ₹15L top-up on his existing home loan (HL-8821) for home renovation and solar panel installation. He asked about lower processing fee waivers. Agreed to forward waiver request to branch head. Also mentioned interest in child education mutual fund SIP of ₹25,000/month starting next month. Action item: send loan sanction draft by tomorrow and share SIP fund performance sheet.</textarea>
+              </div>
+
+              <button onclick="processAiMeetingNotes()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-3 px-4 rounded-xl shadow transition-all flex items-center justify-center space-x-2">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>Generate AI Structure & Draft Tasks</span>
+              </button>
+            </div>
+
+            <!-- Right: AI Draft Output & Confirmation -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col space-y-4">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h2 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+                  <i data-lucide="check-square" class="w-4 h-4 text-emerald-600"></i>
+                  <span>AI Draft Output (Review Required)</span>
+                </h2>
+                <span id="aiStatusBadge" class="text-[10px] bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">Ready to Generate</span>
+              </div>
+
+              <div id="aiOutputContainer" class="space-y-4 text-xs">
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-slate-400 text-center">
+                  Click <strong class="text-slate-600">"Generate AI Structure"</strong> to parse raw notes into summary, decisions, and tasks.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function processAiMeetingNotes() {
+      const title = document.getElementById('meetingTitleInput').value;
+      const raw = document.getElementById('rawNotesInput').value;
+      const outputContainer = document.getElementById('aiOutputContainer');
+      const badge = document.getElementById('aiStatusBadge');
+
+      badge.className = 'text-[10px] bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full font-medium';
+      badge.innerText = 'Draft Generated (Unconfirmed)';
+
+      outputContainer.innerHTML = `
+        <div class="space-y-3">
+          <div class="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100">
+            <span class="font-semibold text-indigo-900 block mb-1">Meeting Summary</span>
+            <p class="text-slate-700">Client Vikram Patel visited branch regarding a ₹15L home loan top-up for renovation/solar installation and inquired about processing fee waivers. Also expressed interest in a ₹25,000/month child education SIP.</p>
+          </div>
+
+          <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100">
+            <span class="font-semibold text-emerald-900 block mb-1">Key Decisions & Instructions</span>
+            <ul class="list-disc pl-4 text-slate-700 space-y-1">
+              <li>Forward processing fee waiver request to Branch Head for approval.</li>
+              <li>Dispatch mortgage sanction draft for home loan top-up.</li>
+            </ul>
+          </div>
+
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="font-semibold text-slate-900 block mb-1">Draft Tasks Proposed by AI</span>
+            <div class="space-y-2 mt-2">
+              <div class="p-2 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+                <div>
+                  <div class="font-medium text-slate-800">Send mortgage sanction draft for ₹15L top-up</div>
+                  <div class="text-[10px] text-slate-500">Owner: Aarav Sharma • Due: Tomorrow</div>
+                </div>
+                <span class="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-medium">Task #1</span>
+              </div>
+              <div class="p-2 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+                <div>
+                  <div class="font-medium text-slate-800">Email child education SIP fund performance sheet</div>
+                  <div class="text-[10px] text-slate-500">Owner: Aarav Sharma • Due: In 2 Days</div>
+                </div>
+                <span class="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-medium">Task #2</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 flex items-center space-x-3">
+            <button onclick="confirmAiDraftSaved()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow transition-all flex items-center justify-center space-x-2">
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Confirm & Save to Record</span>
+            </button>
+            <button onclick="renderMeetingNotesPage(document.getElementById('mainViewport'))" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl transition-all">
+              Discard
+            </button>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function confirmAiDraftSaved() {
+      showToast('AI meeting notes and draft tasks successfully confirmed and saved to official record!', 'success');
+      db.auditLog.unshift({
+        id: 'AUD-' + Math.floor(Math.random()*900+100),
+        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        user: `${currentUser.name} (${currentUser.id})`,
+        action: 'AI Notes Confirmed',
+        details: 'Reviewed and confirmed AI-generated meeting notes and tasks.'
+      });
+      renderMeetingNotesPage(document.getElementById('mainViewport'));
+    }
+
+    // --- PAGE 3: PLANNED AND UNPLANNED VISITS ---
+    function renderVisitsPage(container) {
+      container.innerHTML = `
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                <span>Branch & Client Visits Manager</span>
+              </div>
+              <h1 class="text-2xl font-bold text-slate-900">Planned & Unplanned Customer Visits</h1>
+              <p class="text-xs text-slate-500 mt-0.5">Record branch consultations, field visits, or cold walk-ins. Location is entered manually or with explicit consent.</p>
+            </div>
+            <button onclick="openNewVisitModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition-all flex items-center space-x-2">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Log New Visit</span>
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <h2 class="font-bold text-slate-900 text-sm">Recent & Planned Visits Log</h2>
+              <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium">${db.visits.length} Total Visits Recorded</span>
+            </div>
+            <div class="divide-y divide-slate-100 overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
+                  <tr>
+                    <th class="p-4">Customer</th>
+                    <th class="p-4">Visit Type</th>
+                    <th class="p-4">Date & Time</th>
+                    <th class="p-4">Location Label</th>
+                    <th class="p-4">Outcome & Remarks</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${db.visits.map(v => `
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                      <td class="p-4 font-semibold text-slate-900">${v.customer}</td>
+                      <td class="p-4"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-medium">${v.type}</span></td>
+                      <td class="p-4 text-slate-600">${v.date}</td>
+                      <td class="p-4 text-slate-600">${v.location}</td>
+                      <td class="p-4 text-slate-600 max-w-xs truncate" title="${v.outcome}">${v.outcome}</td>
+                      <td class="p-4">
+                        <span class="px-2 py-1 rounded font-medium ${v.status === 'Completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${v.status}</span>
+                      </td>
+                      <td class="p-4 text-right">
+                        <button onclick="openEditVisitModal('${v.id}')" class="text-indigo-600 hover:text-indigo-800 font-medium">Update</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- PAGE 4: CUSTOMER ISSUES AND RESOLUTION FOLLOW-UPS ---
+    function renderIssuesPage(container) {
+      container.innerHTML = `
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">
+                <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+                <span>Customer Issue & Resolution Tracker</span>
+              </div>
+              <h1 class="text-2xl font-bold text-slate-900">Customer Issues & Service TATs</h1>
+              <p class="text-xs text-slate-500 mt-0.5">Track resolution status, service turnaround time (TAT), deadlines, and escalation history.</p>
+            </div>
+            <button onclick="openNewIssueModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition-all flex items-center space-x-2">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Log New Issue</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-xs text-slate-500 font-medium">Open / In Progress</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1">${db.issues.filter(i => i.status !== 'Resolved').length}</div>
+              </div>
+              <div class="p-3 bg-amber-50 text-amber-600 rounded-xl"><i data-lucide="clock" class="w-6 h-6"></i></div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-xs text-slate-500 font-medium">Urgent Priority</div>
+                <div class="text-2xl font-bold text-rose-600 mt-1">${db.issues.filter(i => i.priority === 'Urgent').length}</div>
+              </div>
+              <div class="p-3 bg-rose-50 text-rose-600 rounded-xl"><i data-lucide="alert-triangle" class="w-6 h-6"></i></div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-xs text-slate-500 font-medium">Resolved This Week</div>
+                <div class="text-2xl font-bold text-emerald-600 mt-1">${db.issues.filter(i => i.status === 'Resolved').length}</div>
+              </div>
+              <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl"><i data-lucide="check-circle" class="w-6 h-6"></i></div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <h2 class="font-bold text-slate-900 text-sm">Active Issue Register</h2>
+            </div>
+            <div class="divide-y divide-slate-100">
+              ${db.issues.map(iss => `
+                <div class="p-5 hover:bg-slate-50/80 transition-colors flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div class="space-y-1.5">
+                    <div class="flex items-center space-x-2">
+                      <span class="text-xs font-bold text-indigo-600">${iss.id}</span>
+                      <span class="text-xs font-semibold text-slate-900">${iss.customer} - ${iss.type}</span>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-medium ${iss.priority === 'Urgent' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'}">${iss.priority}</span>
+                    </div>
+                    <p class="text-xs text-slate-600">${iss.description}</p>
+                    <div class="flex items-center space-x-4 text-[11px] text-slate-500">
+                      <span>Owner: <strong class="text-slate-700">${iss.owner}</strong></span>
+                      <span>•</span>
+                      <span>TAT Deadline: <strong class="text-slate-700">${iss.deadline}</strong></span>
+                      <span>•</span>
+                      <span>Time Remaining: <strong class="text-indigo-600">${iss.timeRemaining}</strong></span>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-3 shrink-0">
+                    <span class="px-3 py-1 rounded-full text-xs font-medium ${
+                      iss.status === 'Resolved' ? 'bg-emerald-50 text-emerald-700' :
+                      iss.status === 'In Progress' ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'
+                    }">${iss.status}</span>
+                    <button onclick="openIssueDetailsModal('${iss.id}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors">
+                      Manage
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- PAGE 5: PAPERWORK AND PROCESS INSTRUCTIONS ---
+    function renderPaperworkPage(container) {
+      container.innerHTML = `
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                <span>Compliance & Paperwork Checklist</span>
+              </div>
+              <h1 class="text-2xl font-bold text-slate-900">Paperwork & Approved Process Instructions</h1>
+              <p class="text-xs text-slate-500 mt-0.5">Track document verification, missing paperwork, and official process checklists linked to approved bank guidelines.</p>
+            </div>
+            <button onclick="openNewPaperworkModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition-all flex items-center space-x-2">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Add Checklist Item</span>
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <h2 class="font-bold text-slate-900 text-sm">Active Process Document Tracker</h2>
+              <span class="text-xs bg-indigo-50 text-indigo-700 font-medium px-3 py-1 rounded-full">Source: Approved Compliance Manual v4.2</span>
+            </div>
+            <div class="divide-y divide-slate-100 overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
+                  <tr>
+                    <th class="p-4">Customer & Process</th>
+                    <th class="p-4">Required Document / Action</th>
+                    <th class="p-4">Source Guidance</th>
+                    <th class="p-4">Due Date & TAT</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${db.paperwork.map(doc => `
+                    <tr class="hover:bg-slate-50/85 transition-colors">
+                      <td class="p-4">
+                        <div class="font-semibold text-slate-900">${doc.customer}</div>
+                        <div class="text-[10px] text-slate-500">${doc.process}</div>
+                      </td>
+                      <td class="p-4 text-slate-700 font-medium">${doc.requiredDoc}</td>
+                      <td class="p-4">
+                        <span class="text-indigo-600 hover:underline cursor-pointer" title="Approved bank guideline reference">${doc.source}</span>
+                      </td>
+                      <td class="p-4 text-slate-600">${doc.dueDate} <span class="text-[10px] text-slate-400 block">SLA: ${doc.tat}</span></td>
+                      <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-medium ${
+                          doc.status === 'Verified' ? 'bg-emerald-50 text-emerald-700' :
+                          doc.status === 'Submitted' ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'
+                        }">${doc.status}</span>
+                      </td>
+                      <td class="p-4 text-right">
+                        <button onclick="advancePaperworkStatus('${doc.id}')" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg transition-colors">Update</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- PAGE 6: SHARED CUSTOMER OUTREACH & OFFER COORDINATION ---
+    function renderOutreachPage(container) {
+      container.innerHTML = `
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">
+                <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                <span>Outreach Coordination Workspace</span>
+              </div>
+              <h1 class="text-2xl font-bold text-slate-900">Shared Customer Outreach & Offer Coordination</h1>
+              <p class="text-xs text-slate-500 mt-0.5">Check real-time team contact history to prevent duplicate outreach. Conflict-safe locking enforces co-down periods.</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs bg-emerald-50 text-emerald-700 font-medium px-3 py-1.5 rounded-xl border border-emerald-200 flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Real-Time Sync Active</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-slate-50/50">
+              <h2 class="font-bold text-slate-900 text-sm">Offer Outreach Register</h2>
+              <div class="flex items-center space-x-3 w-full md:w-auto">
+                <div class="relative flex-1 md:w-64">
+                  <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3"></i>
+                  <input type="text" placeholder="Search customer or offer..." class="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500" oninput="filterOutreachTable(this.value)">
+                </div>
+              </div>
+            </div>
+
+            <div class="divide-y divide-slate-100 overflow-x-auto">
+              <table class="w-full text-left text-xs" id="outreachTable">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
+                  <tr>
+                    <th class="p-4">Customer</th>
+                    <th class="p-4">Available Offer</th>
+                    <th class="p-4">Shared Status</th>
+                    <th class="p-4">Claimed Owner</th>
+                    <th class="p-4">Last Contact & Channel</th>
+                    <th class="p-4">Cooldown / Notes</th>
+                    <th class="p-4 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${db.outreach.map(o => `
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                      <td class="p-4 font-semibold text-slate-900">${o.customer}</td>
+                      <td class="p-4 text-slate-700">${o.offer}</td>
+                      <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-medium ${
+                          o.status === 'Claimed' ? 'bg-indigo-50 text-indigo-700' :
+                          o.status === 'Contacted' ? 'bg-blue-50 text-blue-700' :
+                          o.status === 'Declined' ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-600'
+                        }">${o.status}</span>
+                      </td>
+                      <td class="p-4 text-slate-600">${o.owner || 'Unassigned'}</td>
+                      <td class="p-4 text-slate-600">${o.lastContact} <span class="text-[10px] text-slate-400 block">${o.channel}</span></td>
+                      <td class="p-4 text-slate-600 max-w-xs">
+                        <div class="text-[10px] text-amber-600 font-medium mb-0.5">Cooldown: ${o.cooldownUntil || 'None'}</div>
+                        <div class="truncate">${o.notes}</div>
+                      </td>
+                      <td class="p-4 text-right">
+                        ${o.status === 'Unclaimed' ? `
+                          <button onclick="claimOutreach('${o.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow transition-all">Claim</button>
+                        ` : `
+                          <button onclick="openOutreachDetails('${o.id}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition-colors">View</button>
+                        `}
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function claimOutreach(id) {
+      const item = db.outreach.find(o => o.id === id);
+      if (!item) return;
+
+      // Check duplicate outreach safety warning
+      if (item.status !== 'Unclaimed') {
+        alert(`Duplicate Outreach Warning: Customer ${item.customer} is already claimed/contacted by ${item.owner}. Contact attempt blocked by conflict-safe rule.`);
+        return;
+      }
+
+      item.status = 'Claimed';
+      item.owner = currentUser.name;
+      item.lastContact = 'Today';
+      item.channel = 'Assigned';
+      item.cooldownUntil = '2026-03-30';
+
+      db.auditLog.unshift({
+        id: 'AUD-' + Math.floor(Math.random()*900+100),
+        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        user: `${currentUser.name} (${currentUser.id})`,
+        action: 'Claimed Outreach',
+        details: `Claimed offer outreach for ${item.customer} (${item.offer}).`
+      });
+
+      showToast(`Successfully claimed outreach for ${item.customer}. Cooldown lock engaged.`, 'success');
+      renderOutreachPage(document.getElementById('mainViewport'));
+    }
+
+    // --- PAGE 7: REMINDERS ---
+    function renderRemindersPage(container) {
+      container.innerHTML = `
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">
+                <i data-lucide="bell" class="w-3.5 h-3.5"></i>
+                <span>Task & Follow-up Reminders</span>
+              </div>
+              <h1 class="text-2xl font-bold text-slate-900">Reminders & Escalations</h1>
+              <p class="text-xs text-slate-500 mt-0.5">Manage one-time or recurring reminders across visits, paperwork, customer issues, and process TAT deadlines.</p>
+            </div>
+            <button onclick="openNewReminderModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition-all flex items-center space-x-2">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Create Reminder</span>
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <h2 class="font-bold text-slate-900 text-sm">All Active Reminders</h2>
+            </div>
+            <div class="divide-y divide-slate-100">
+              ${db.reminders.map(r => `
+                <div class="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between">
+                  <div class="flex items-start space-x-3">
+                    <div class="p-2 bg-indigo-50 text-indigo-600 rounded-xl mt-0.5">
+                      <i data-lucide="bell" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                      <div class="text-xs font-semibold text-slate-900">${r.title}</div>
+                      <div class="text-[11px] text-slate-500 flex items-center space-x-3 mt-1">
+                        <span class="bg-slate-100 px-2 py-0.5 rounded font-medium">${r.type}</span>
+                        <span>Due: <strong class="text-slate-700">${r.date}</strong></span>
+                        <span>Owner: <strong class="text-slate-700">${r.owner}</strong></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700">${r.status}</span>
+                    <button onclick="completeReminder('${r.id}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors">Complete</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- PAGE 8: TEAM OVERVIEW (MANAGER/ADMIN) ---
+    function renderTeamOverviewPage(container) {
+      container.innerHTML = `
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">
+                <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i>
+                <span>Branch Manager Command Center</span>
+              </div>
+              <h1 class="text-2xl font-bold text-slate-900">Team Workload & Outreach Coordination</h1>
+              <p class="text-xs text-slate-500 mt-0.5">Monitor branch team activity, workload balance, overdue items, and audit logs.</p>
+            </div>
+            <div class="px-3 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl text-xs font-semibold">
+              Branch Downtown (#104) • 4 Active Bankers
+            </div>
+          </div>
+
+          <!-- Team Table -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 bg-slate-50/50">
+              <h2 class="font-bold text-slate-900 text-sm">Team Workload Summary</h2>
+            </div>
+            <div class="divide-y divide-slate-100 overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
+                  <tr>
+                    <th class="p-4">Banker Name</th>
+                    <th class="p-4">Role</th>
+                    <th class="p-4">Active Tasks</th>
+                    <th class="p-4">Pending Visits</th>
+                    <th class="p-4">Outreach Done</th>
+                    <th class="p-4">Customer CSAT</th>
+                    <th class="p-4 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${db.teamWorkload.map(tw => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                      <td class="p-4 font-semibold text-slate-900">${tw.name}</td>
+                      <td class="p-4"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-medium">${tw.role}</span></td>
+                      <td class="p-4 font-semibold text-slate-800">${tw.activeTasks}</td>
+                      <td class="p-4 text-slate-600">${tw.pendingVisits}</td>
+                      <td class="p-4 text-slate-600">${tw.outreachDone}</td>
+                      <td class="p-4 text-emerald-600 font-semibold">${tw.rating}</td>
+                      <td class="p-4 text-right">
+                        <button onclick="showToast('Viewing workload details for ${tw.name}', 'info')" class="text-indigo-600 hover:text-indigo-800 font-medium">View Load</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Audit Log Trail -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+              <h2 class="font-bold text-slate-900 text-sm">System Audit Trail (Changes & Outreach Claims)</h2>
+              <span class="text-[10px] bg-slate-100 text-slate-600 px-2.5 py-1 rounded font-mono">Immutable Log</span>
+            </div>
+            <div class="divide-y divide-slate-100 max-h-72 overflow-y-auto custom-scrollbar">
+              ${db.auditLog.map(aud => `
+                <div class="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between text-xs">
+                  <div>
+                    <div class="font-semibold text-slate-800">${aud.action}: <span class="font-normal text-slate-600">${aud.details}</span></div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">User: ${aud.user}</div>
+                  </div>
+                  <div class="text-[11px] font-mono text-slate-500 bg-slate-100 px-2 py-1 rounded">${aud.timestamp}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- PAGE 9: SETTINGS & ADMIN ---
+    function renderSettingsPage(container) {
+      container.innerHTML = `
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">
+              <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+              <span>Administrator Console</span>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900">Admin Settings & Offer Rules</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Configure system parameters, cooldown periods, approved process guidelines, and integration credentials.</p>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+            <h2 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">Outreach & Cooldown Configuration</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Offer Outreach Cooldown Period (Days)</label>
+                <input type="number" id="settingCooldown" value="${db.adminSettings.cooldownDays}" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500">
+                <p class="text-[11px] text-slate-400 mt-1">Prevents duplicate employee outreach to the same customer for this duration.</p>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Approved Process Guideline Version</label>
+                <input type="text" id="settingProcessVersion" value="${db.adminSettings.approvedProcessVersion}" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500">
+                <p class="text-[11px] text-slate-400 mt-1">Linked directly to central compliance documentation repo.</p>
+              </div>
+            </div>
+
+            <div class="space-y-3 pt-2">
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" id="settingAutoAssign" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                <span class="text-xs font-semibold text-slate-800">Enable automatic lead distribution based on branch banker workload</span>
+              </label>
+
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" id="settingStrictTat" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                <span class="text-xs font-semibold text-slate-800">Enforce strict TAT escalation alerts to managers when deadlines approach</span>
+              </label>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 flex justify-end">
+              <button onclick="saveAdminSettings()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-xl shadow transition-all text-xs">
+                Save Configuration Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function saveAdminSettings() {
+      db.adminSettings.cooldownDays = document.getElementById('settingCooldown').value;
+      db.adminSettings.approvedProcessVersion = document.getElementById('settingProcessVersion').value;
+      showToast('Admin settings successfully updated across branch cluster!', 'success');
+    }
+
+    // --- AI ASSISTANT MODAL ---
+    function openAiAssistantModal() {
+      const container = document.getElementById('modalContainer');
+      container.innerHTML = `
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-4 bg-indigo-900 text-white flex justify-between items-center">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="sparkles" class="w-5 h-5 text-indigo-300"></i>
+                <span class="font-bold text-sm">OmniBanker AI Copilot Assistant</span>
+              </div>
+              <button onclick="closeModal()" class="text-indigo-200 hover:text-white p-1">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto custom-scrollbar space-y-4 flex-1 text-xs" id="copilotChatArea">
+              <div class="p-3.5 bg-indigo-50/70 rounded-xl border border-indigo-100 text-slate-700 space-y-1">
+                <div class="font-semibold text-indigo-900 flex items-center space-x-1.5">
+                  <i data-lucide="bot" class="w-4 h-4 text-indigo-600"></i>
+                  <span>Copilot Suggestion Engine</span>
+                </div>
+                <p>Hello Aarav! Based on your assigned tasks, customer preferences, and approved offer rules, here is your recommended focus for today:</p>
+                <ul class="list-disc pl-4 space-y-1 pt-1 text-slate-600">
+                  <li><strong>Priority 1:</strong> Call Vikram Patel regarding home loan top-up sanction paperwork (Due today).</li>
+                  <li><strong>Priority 2:</strong> Resolve KYC address discrepancy for Rajesh Kumar (TAT deadline in 4 hours).</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-100 bg-slate-50 flex items-center space-x-2">
+              <input type="text" id="copilotPromptInput" placeholder="Ask AI about process rules, TAT deadlines, or next outreach..." class="flex-1 p-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-indigo-500 bg-white" onkeydown="if(event.key==='Enter') sendCopilotPrompt()">
+              <button onclick="sendCopilotPrompt()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow transition-all">Send</button>
+            </div>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function sendCopilotPrompt() {
+      const input = document.getElementById('copilotPromptInput');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const chatArea = document.getElementById('copilotChatArea');
+      chatArea.innerHTML += `
+        <div class="flex justify-end">
+          <div class="bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-none max-w-md">${val}</div>
+        </div>
+      `;
+      input.value = '';
+
+      setTimeout(() => {
+        chatArea.innerHTML += `
+          <div class="flex items-start space-x-2">
+            <div class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-[10px] shrink-0 mt-1">AI</div>
+            <div class="bg-slate-100 p-3.5 rounded-2xl rounded-tl-none text-slate-700 max-w-md space-y-1">
+              <div class="font-semibold text-slate-900">Analysis & Approved Guideline Match</div>
+              <p>Based on Approved Mortgage Guidelines v4.2 (Sec 3.1), property tax receipts and registered sale deeds are mandatory before loan disbursement. No credit or pricing suitability decisions were made by AI.</p>
+            </div>
+          </div>
+        `;
+        chatArea.scrollTop = chatArea.scrollHeight;
+        lucide.createIcons();
+      }, 600);
+    }
+
+    // --- QUICK INTERACTION MODAL ---
+    function openQuickInteractionModal() {
+      const container = document.getElementById('modalContainer');
+      container.innerHTML = `
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
+            <div class="p-4 bg-indigo-900 text-white flex justify-between items-center">
+              <span class="font-bold text-sm">Log Customer Interaction</span>
+              <button onclick="closeModal()" class="text-indigo-200 hover:text-white p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Customer Name</label>
+                <input type="text" id="logCustomer" placeholder="e.g. Vikram Patel" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500">
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block font-semibold text-slate-700 mb-1">Channel</label>
+                  <select id="logChannel" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 bg-white">
+                    <option>In-Person Branch Visit</option>
+                    <option>Phone Call</option>
+                    <option>Secure Email</option>
+                    <option>Video Call</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-700 mb-1">Topic / Offer</label>
+                  <input type="text" id="logTopic" placeholder="e.g. Home Loan Top-Up" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Notes & Outcome</label>
+                <textarea id="logNotes" rows="3" placeholder="Summary of discussion..." class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
+              </div>
+              <div class="pt-2 flex justify-end space-x-2">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">Cancel</button>
+                <button onclick="saveInteractionLog()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow">Save Record</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function saveInteractionLog() {
+      const cust = document.getElementById('logCustomer').value || 'Customer';
+      showToast(`Interaction with ${cust} successfully saved to official record!`, 'success');
+      closeModal();
+    }
+
+    // --- OTHER MODAL HELPERS ---
+    function openNewReminderModal() {
+      const container = document.getElementById('modalContainer');
+      container.innerHTML = `
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden">
+            <div class="p-4 bg-indigo-900 text-white flex justify-between items-center">
+              <span class="font-bold text-sm">Create New Reminder</span>
+              <button onclick="closeModal()" class="text-indigo-200 hover:text-white p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Reminder Title</label>
+                <input type="text" id="remTitleInput" placeholder="e.g. Follow up on document submission" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500">
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block font-semibold text-slate-700 mb-1">Due Date & Time</label>
+                  <input type="text" id="remDateInput" value="Today, 04:00 PM" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-700 mb-1">Category</label>
+                  <select id="remTypeInput" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 bg-white">
+                    <option>Task</option>
+                    <option>Paperwork</option>
+                    <option>Visit</option>
+                    <option>Issue</option>
+                  </select>
+                </div>
+              </div>
+              <div class="pt-2 flex justify-end space-x-2">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">Cancel</button>
+                <button onclick="confirmNewReminder()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow">Create Reminder</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function confirmNewReminder() {
+      const title = document.getElementById('remTitleInput').value || 'New Reminder';
+      const date = document.getElementById('remDateInput').value;
+      const type = document.getElementById('remTypeInput').value;
+
+      db.reminders.unshift({
+        id: 'REM-' + Math.floor(Math.random()*90+10),
+        title,
+        date,
+        type,
+        owner: currentUser.name,
+        status: 'Active'
+      });
+
+      showToast('Reminder successfully created and scheduled!', 'success');
+      closeModal();
+      renderActivePage();
+    }
+
+    function completeReminder(id) {
+      db.reminders = db.reminders.filter(r => r.id !== id);
+      showToast('Reminder completed and removed.', 'success');
+      renderActivePage();
+    }
+
+    function toggleTaskStatus(id) {
+      const task = db.tasks.find(t => t.id === id);
+      if (task) {
+        task.status = task.status === 'Completed' ? 'Pending' : 'Completed';
+        showToast(`Task status updated to ${task.status}`, 'success');
+        renderActivePage();
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modalContainer').innerHTML = '';
+    }
+
+    function toggleNotifications() {
+      const dropdown = document.getElementById('notifDropdown');
+      dropdown.classList.toggle('hidden');
+      
+      const list = document.getElementById('notifList');
+      list.innerHTML = `
+        <div class="p-3 hover:bg-slate-50 cursor-pointer">
+          <div class="font-semibold text-xs text-slate-800">TAT Warning: Issue ISS-902</div>
+          <div class="text-[10px] text-slate-500">Sunita Rao NEFT transfer expiring in 1 hour.</div>
+        </div>
+        <div class="p-3 hover:bg-slate-50 cursor-pointer">
+          <div class="font-semibold text-xs text-slate-800">New Outreach Claim</div>
+          <div class="text-[10px] text-slate-500">Vikram Patel top-up offer claimed by Aarav Sharma.</div>
+        </div>
+        <div class="p-3 hover:bg-slate-50 cursor-pointer">
+          <div class="font-semibold text-xs text-slate-800">Compliance Audit Notice</div>
+          <div class="text-[10px] text-slate-500">Monthly branch audit documentation due by Friday.</div>
+        </div>
+      `;
+    }
+
+    function updateNotificationBadge() {
+      document.getElementById('notifBadge').innerText = '3';
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `p-4 rounded-xl shadow-2xl border text-xs font-semibold flex items-center space-x-2 transition-all transform translate-y-2 pointer-events-auto ${
+        type === 'success' ? 'bg-slate-900 text-white border-slate-800' : 'bg-indigo-900 text-white border-indigo-800'
+      }`;
+      toast.innerHTML = `
+        <i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-4 h-4 text-emerald-400"></i>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function handleGlobalSearch(query) {
+      if (query.length > 2) {
+        // Quick feedback or filter demo
+      }
+    }
+
+    function filterOutreachTable(query) {
+      // Basic table filtering simulation
+    }
+
+    function openRescheduleModal(id) {
+      showToast(`Reschedule modal opened for task ${id}`, 'info');
+    }
+
+    function openNewVisitModal() {
+      showToast('New visit logging modal opened.', 'info');
+    }
+
+    function openEditVisitModal(id) {
+      showToast(`Editing visit record ${id}`, 'info');
+    }
+
+    function openNewIssueModal() {
+      showToast('New customer issue modal opened.', 'info');
+    }
+
+    function openIssueDetailsModal(id) {
+      showToast(`Managing issue ${id}`, 'info');
+    }
+
+    function openNewPaperworkModal() {
+      showToast('New paperwork checklist item modal opened.', 'info');
+    }
+
+    function advancePaperworkStatus(id) {
+      const doc = db.paperwork.find(d => d.id === id);
+      if (doc) {
+        doc.status = doc.status === 'Pending' ? 'Submitted' : doc.status === 'Submitted' ? 'Verified' : 'Pending';
+        showToast(`Paperwork status for ${doc.customer} advanced to ${doc.status}`, 'success');
+        renderActivePage();
+      }
+    }
+
+    function openOutreachDetails(id) {
+      showToast(`Opening shared outreach details for ${id}`, 'info');
+    }
+  </script>
+</body>
+</html>
